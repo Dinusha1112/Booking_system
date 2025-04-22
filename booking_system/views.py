@@ -1,7 +1,6 @@
 from django.shortcuts import render
 
-def home(request):
-    return render(request, 'booking_system/home.html')
+
 
 from django.shortcuts import render, redirect
 from django.contrib import messages

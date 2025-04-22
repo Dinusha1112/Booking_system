@@ -1,8 +1,11 @@
 /* General styles */
 body {
-    background-color: #f0f0f0;
+    background: linear-gradient(to bottom right, #1a0000, #330000, #660000);
     font-family: 'Poppins', sans-serif;
+    color: #ffffff;
 }
+
+
 
 .card {
     margin-bottom: 20px;

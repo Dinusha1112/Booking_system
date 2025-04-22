@@ -1,8 +1,66 @@
+/* General styles */
 body {
-    background-color: #f0f2f5;
-    font-family: 'Segoe UI', sans-serif;
+    background-color: #f0f0f0;
 }
+
 .card {
-    border-radius: 15px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+footer {
+    background-color: #222;
+    color: #fff;
+}
+
+/* Movie Carousel */
+.swiper-container {
+    margin-top: 20px;
+    max-height: 500px;
+}
+
+.swiper-slide img {
+    object-fit: cover;
+    height: 100%;
+}
+
+/* Movie Card */
+.card-body {
+    background-color: #fff;
+    padding: 20px;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.card-text {
+    color: #555;
+}
+
+/* Button styling */
+.btn-warning {
+    background-color: #ff9900;
+    border: none;
+}
+
+.text-center h3 {
+    color: #ff9900;
+    font-size: 2.5rem;
+}
+
+.text-center p {
+    font-size: 1.2rem;
+}
+
+/* Custom Styling for Now Showing Section */
+.card-img-top {
+    border-radius: 8px;
+}
+
+/* Footer */
+footer {
+    background-color: #222;
+    color: #fff;
 }

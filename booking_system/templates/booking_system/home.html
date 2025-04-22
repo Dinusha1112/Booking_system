@@ -2,10 +2,30 @@
 
 {% block content %}
 {% load static %}
-<h1 class="text-center mb-5">Now Showing 🎬</h1>
 
+<!-- Movie Carousel -->
+<div class="swiper-container my-4">
+    <div class="swiper-wrapper">
+        <div class="swiper-slide">
+            <img src="{% static 'images/avengers.jpg' %}" class="d-block w-100" alt="Avengers">
+        </div>
+        <div class="swiper-slide">
+            <img src="{% static 'images/blackwidow.jpg' %}" class="d-block w-100" alt="Black Widow">
+        </div>
+        <div class="swiper-slide">
+            <img src="{% static 'images/spiderman.jpg' %}" class="d-block w-100" alt="Spider-Man">
+        </div>
+    </div>
+    <!-- Add Pagination and Navigation -->
+    <div class="swiper-pagination"></div>
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+</div>
+
+<!-- Now Showing Section -->
+<h2 class="text-center mb-5">Now Showing 🎬</h2>
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card">
             <img src="{% static 'images/avengers.jpg' %}" class="card-img-top" alt="Avengers">
             <div class="card-body">
@@ -15,6 +35,23 @@
             </div>
         </div>
     </div>
+    <div class="col-md-3">
+        <div class="card">
+            <img src="{% static 'images/blackwidow.jpg' %}" class="card-img-top" alt="Black Widow">
+            <div class="card-body">
+                <h5 class="card-title">Black Widow</h5>
+                <p class="card-text">Show Times: 12:00 PM, 4:00 PM, 8:00 PM</p>
+                <a href="#" class="btn btn-primary">Book Now</a>
+            </div>
+        </div>
+    </div>
     <!-- Repeat for more movies -->
+</div>
+
+<!-- Promotional Banner -->
+<div class="text-center mt-5">
+    <h3>Exclusive Offer!</h3>
+    <p>Get 50% off on your first booking! Use code MOVIE50 at checkout.</p>
+    <a href="#" class="btn btn-warning">Book Now</a>
 </div>
 {% endblock %}

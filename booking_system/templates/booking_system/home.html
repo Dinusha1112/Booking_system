@@ -1,11 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Movie Ticket Booking</title>
-</head>
-<body>
-    <h1>🎬 Welcome to the Movie Ticket Booking System</h1>
-    <p>Book your favorite movies with ease!</p>
-</body>
-</html>
+{% extends 'booking_system/base.html' %}
+
+{% block content %}
+{% load static %}
+<h1 class="text-center mb-5">Now Showing 🎬</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <img src="{% static 'images/avengers.jpg' %}" class="card-img-top" alt="Avengers">
+            <div class="card-body">
+                <h5 class="card-title">Avengers: Endgame</h5>
+                <p class="card-text">Show Times: 10:00 AM, 2:00 PM, 6:00 PM</p>
+                <a href="#" class="btn btn-primary">Book Now</a>
+            </div>
+        </div>
+    </div>
+    <!-- Repeat for more movies -->
+</div>
+{% endblock %}

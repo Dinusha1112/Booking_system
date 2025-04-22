@@ -1,57 +1,75 @@
 {% extends 'booking_system/base.html' %}
-
-{% block content %}
 {% load static %}
 
+{% block content %}
 <!-- Movie Carousel -->
-<div class="swiper-container my-4">
-    <div class="swiper-wrapper">
-        <div class="swiper-slide">
-            <img src="{% static 'images/avengers.jpg' %}" class="d-block w-100" alt="Avengers">
+<div class="container mt-4">
+    <div class="swiper-container">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide">
+                <img src="{% static 'images/avengers.jpg' %}" class="d-block w-100" alt="Avengers">
+            </div>
+            <div class="swiper-slide">
+                <img src="{% static 'images/blackwidow.jpg' %}" class="d-block w-100" alt="Black Widow">
+            </div>
+            <div class="swiper-slide">
+                <img src="{% static 'images/spiderman.jpg' %}" class="d-block w-100" alt="Spider-Man">
+            </div>
         </div>
-        <div class="swiper-slide">
-            <img src="{% static 'images/blackwidow.jpg' %}" class="d-block w-100" alt="Black Widow">
-        </div>
-        <div class="swiper-slide">
-            <img src="{% static 'images/spiderman.jpg' %}" class="d-block w-100" alt="Spider-Man">
-        </div>
+        <!-- Swiper navigation -->
+        <div class="swiper-pagination"></div>
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
     </div>
-    <!-- Add Pagination and Navigation -->
-    <div class="swiper-pagination"></div>
-    <div class="swiper-button-next"></div>
-    <div class="swiper-button-prev"></div>
 </div>
 
 <!-- Now Showing Section -->
-<h2 class="text-center mb-5">Now Showing 🎬</h2>
-<div class="row">
-    <div class="col-md-3">
-        <div class="card">
-            <img src="{% static 'images/avengers.jpg' %}" class="card-img-top" alt="Avengers">
-            <div class="card-body">
-                <h5 class="card-title">Avengers: Endgame</h5>
-                <p class="card-text">Show Times: 10:00 AM, 2:00 PM, 6:00 PM</p>
-                <a href="#" class="btn btn-primary">Book Now</a>
+<div class="container mt-5">
+    <h2 class="text-center mb-5">Now Showing 🎬</h2>
+    <div class="row justify-content-center">
+        <!-- Movie 1 -->
+        <div class="col-md-4 col-lg-3 d-flex align-items-stretch mb-4">
+            <div class="card h-100 shadow-sm">
+                <img src="{% static 'images/avengers.jpg' %}" class="card-img-top" alt="Avengers">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Avengers: Endgame</h5>
+                    <p class="card-text">Show Times: 10:00 AM, 2:00 PM, 6:00 PM</p>
+                    <a href="#" class="btn btn-primary mt-auto">Book Now</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Movie 2 -->
+        <div class="col-md-4 col-lg-3 d-flex align-items-stretch mb-4">
+            <div class="card h-100 shadow-sm">
+                <img src="{% static 'images/blackwidow.jpg' %}" class="card-img-top" alt="Black Widow">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Black Widow</h5>
+                    <p class="card-text">Show Times: 12:00 PM, 4:00 PM, 8:00 PM</p>
+                    <a href="#" class="btn btn-primary mt-auto">Book Now</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Movie 3 -->
+        <div class="col-md-4 col-lg-3 d-flex align-items-stretch mb-4">
+            <div class="card h-100 shadow-sm">
+                <img src="{% static 'images/spiderman.jpg' %}" class="card-img-top" alt="Spider-Man">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">Spider-Man</h5>
+                    <p class="card-text">Show Times: 2:00 PM, 6:00 PM, 10:00 PM</p>
+                    <a href="#" class="btn btn-primary mt-auto">Book Now</a>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card">
-            <img src="{% static 'images/blackwidow.jpg' %}" class="card-img-top" alt="Black Widow">
-            <div class="card-body">
-                <h5 class="card-title">Black Widow</h5>
-                <p class="card-text">Show Times: 12:00 PM, 4:00 PM, 8:00 PM</p>
-                <a href="#" class="btn btn-primary">Book Now</a>
-            </div>
-        </div>
-    </div>
-    <!-- Repeat for more movies -->
 </div>
 
 <!-- Promotional Banner -->
-<div class="text-center mt-5">
+<div class="text-center mt-5 mb-5">
     <h3>Exclusive Offer!</h3>
-    <p>Get 50% off on your first booking! Use code MOVIE50 at checkout.</p>
+    <p>Get 50% off on your first booking! Use code <strong>MOVIE50</strong> at checkout.</p>
     <a href="#" class="btn btn-warning">Book Now</a>
 </div>
 {% endblock %}
+

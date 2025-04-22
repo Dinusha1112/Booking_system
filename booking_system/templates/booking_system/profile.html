@@ -5,6 +5,9 @@
 <div class="container mt-5">
     <h2>Welcome, {{ user.username }}!</h2>
     <p>Email: {{ user.email }}</p>
+
+    <a href="{% url 'home' %}" class="btn btn-primary me-2">Go to Homepage</a>
     <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
 </div>
+
 {% endblock %}

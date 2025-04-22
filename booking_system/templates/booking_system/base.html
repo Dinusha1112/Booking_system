@@ -17,19 +17,24 @@
 <body>
 
 
-<!-- Black Info Bar (was footer, now moved here) -->
 <section class="text-white bg-dark py-3 mt-5">
     <div class="container text-center">
         <div class="d-flex justify-content-between flex-wrap">
             <div>🎟 Movie Booking</div>
-
             <div>
-                <a href="{% url 'login' %}" class="text-white text-decoration-none">Login</a> |
-                <a href="{% url 'register' %}" class="text-white text-decoration-none">Register</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'profile' %}" class="text-white text-decoration-none">Profile</a> |
+                    <a href="{% url 'logout' %}" class="text-white text-decoration-none">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="text-white text-decoration-none">Login</a> |
+                    <a href="{% url 'register' %}" class="text-white text-decoration-none">Register</a>
+                {% endif %}
             </div>
         </div>
     </div>
 </section>
+
+
 <!-- Main Content (e.g., Welcome Message) -->
 <div class="container mt-4">
     {% block content %}

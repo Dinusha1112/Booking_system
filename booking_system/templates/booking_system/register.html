@@ -1,13 +1,15 @@
-{% extends 'booking_system/base.html' %}
-{% load static %}
-
-{% block content %}
-<div class="container mt-5">
-    <h2>Register</h2>
-    <form method="POST">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+</head>
+<body>
+    <h2>User Registration</h2>
+    <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Sign Up</button>
+        <button type="submit">Register</button>
     </form>
-</div>
-{% endblock %}
+</body>
+</html>
+

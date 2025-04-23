@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Book Tickets</title>
+</head>
+<body>
+    <h1>Book Tickets for {{ movie.name }}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Book Now</button>
+    </form>
+
+    <a href="{% url 'home' %}">Back to Home</a>
+</body>
+</html>

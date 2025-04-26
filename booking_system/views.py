@@ -1,12 +1,9 @@
-from django.shortcuts import render
-
-
-
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegisterForm
+from movies.models import Movie
 
 def register_view(request):
     if request.method == 'POST':
@@ -20,7 +17,7 @@ def register_view(request):
     return render(request, 'booking_system/register.html', {'form': form})
 
 def login_view(request):
-    next_url = request.GET.get('next', 'profile')  # Redirect to 'profile' if 'next' isn't provided
+    next_url = request.GET.get('next', 'profile')
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -38,9 +35,10 @@ def logout_view(request):
 
 @login_required
 def profile_view(request):
-    return render(request, 'booking_system/profile.html')
-
-from django.shortcuts import render
+    return render(request, 'booking_system/profile.html', {
+        'profile': request.user.userprofile
+    })
 
 def home_view(request):
-    return render(request, 'booking_system/home.html')
+    movies = Movie.objects.all()[:3]  # Get first 3 movies for the homepage
+    return render(request, 'booking_system/home.html', {'movies': movies})

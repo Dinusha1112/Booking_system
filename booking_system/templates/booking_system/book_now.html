@@ -1,0 +1,187 @@
+{% extends 'booking_system/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Book Tickets for {{ showtime.movie.title }}</h2>
+            <p class="text-muted">
+                {{ showtime.date }} at {{ showtime.time }} | 
+                Theater: Screen 1 | Price: ${{ showtime.price }}
+            </p>
+            
+            <div class="theater-container mt-4">
+                <div class="screen text-center mb-4">SCREEN</div>
+                
+                <div class="seats-grid">
+                    {% for row in seat_rows %}
+                    <div class="seat-row">
+                        <span class="row-label">{{ row.0.row }}</span>
+                        {% for seat in row %}
+                        <button class="seat-btn {% if seat.is_booked %}booked{% else %}available{% endif %}" 
+                                data-seat-id="{{ seat.id }}"
+                                {% if seat.is_booked %}disabled{% endif %}>
+                            {{ seat.seat_number }}
+                        </button>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="booking-summary card">
+                <div class="card-header">
+                    <h4>Booking Summary</h4>
+                </div>
+                <div class="card-body">
+                    <h5>{{ showtime.movie.title }}</h5>
+                    <p>{{ showtime.date }} at {{ showtime.time }}</p>
+                    <hr>
+                    
+                    <div id="selected-seats">
+                        <p class="text-muted">No seats selected</p>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <p>Total: $<span id="total-price">0.00</span></p>
+                    </div>
+                    
+                    <form method="POST" id="booking-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="seats" id="selected-seats-input">
+                        <button type="submit" class="btn btn-primary btn-block mt-3" disabled id="book-btn">
+                            Proceed to Payment
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .theater-container {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+    }
+    
+    .screen {
+        background: #333;
+        color: white;
+        padding: 10px;
+        margin: 0 auto;
+        width: 80%;
+        border-radius: 4px;
+    }
+    
+    .seats-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .seat-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .row-label {
+        width: 20px;
+        font-weight: bold;
+    }
+    
+    .seat-btn {
+        width: 35px;
+        height: 35px;
+        border-radius: 4px;
+        border: 1px solid #ddd;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+    
+    .seat-btn.available {
+        background: #fff;
+    }
+    
+    .seat-btn.available:hover {
+        background: #e9ecef;
+    }
+    
+    .seat-btn.selected {
+        background: #28a745;
+        color: white;
+        border-color: #28a745;
+    }
+    
+    .seat-btn.booked {
+        background: #dc3545;
+        color: white;
+        cursor: not-allowed;
+    }
+    
+    .booking-summary {
+        position: sticky;
+        top: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const seatButtons = document.querySelectorAll('.seat-btn.available');
+    const selectedSeatsDiv = document.getElementById('selected-seats');
+    const totalPriceSpan = document.getElementById('total-price');
+    const selectedSeatsInput = document.getElementById('selected-seats-input');
+    const bookBtn = document.getElementById('book-btn');
+    
+    let selectedSeats = [];
+    const seatPrice = {{ showtime.price }};
+    
+    seatButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const seatId = this.getAttribute('data-seat-id');
+            
+            if (this.classList.contains('selected')) {
+                // Deselect seat
+                this.classList.remove('selected');
+                selectedSeats = selectedSeats.filter(id => id !== seatId);
+            } else {
+                // Select seat
+                this.classList.add('selected');
+                selectedSeats.push(seatId);
+            }
+            
+            updateBookingSummary();
+        });
+    });
+    
+    function updateBookingSummary() {
+        if (selectedSeats.length === 0) {
+            selectedSeatsDiv.innerHTML = '<p class="text-muted">No seats selected</p>';
+            totalPriceSpan.textContent = '0.00';
+            bookBtn.disabled = true;
+            selectedSeatsInput.value = '';
+        } else {
+            const totalPrice = (selectedSeats.length * seatPrice).toFixed(2);
+            selectedSeatsDiv.innerHTML = `
+                <p>Selected Seats: ${selectedSeats.length}</p>
+                <p>Price per seat: $${seatPrice}</p>
+            `;
+            totalPriceSpan.textContent = totalPrice;
+            bookBtn.disabled = false;
+            selectedSeatsInput.value = selectedSeats.join(',');
+        }
+    }
+});
+</script>
+{% endblock %}

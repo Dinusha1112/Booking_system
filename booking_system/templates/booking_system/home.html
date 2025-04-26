@@ -18,6 +18,7 @@
             </div>
         {% endif %}
     </div>
+
 <!-- Swiper Section (Carousel) -->
 <div class="swiper-container my-5">
     <div class="swiper-wrapper">
@@ -38,48 +39,37 @@
     <div class="swiper-button-prev"></div>
 </div>
 
-
-    <!-- Now Showing Section -->
-    <div class="container mt-5">
-        <h2 class="text-center mb-5">Now Showing 🎬</h2>
-        <div class="row justify-content-center">
-            <!-- Movie 1 -->
-            <div class="col-md-4 col-lg-3 d-flex align-items-stretch mb-4">
-                <div class="card h-100 shadow-sm">
-                    <img src="{% static 'images/avengers.jpg' %}" class="card-img-top" alt="Avengers">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">Avengers: Endgame</h5>
-                        <p class="card-text">Show Times: 10:00 AM, 2:00 PM, 6:00 PM</p>
-                        <a href="#" class="btn btn-primary mt-auto">Book Now</a>
+<!-- Now Showing Section -->
+<div class="container mt-5">
+    <h2 class="text-center mb-5">Now Showing 🎬</h2>
+    <div class="row justify-content-center">
+        {% for movie in movies %}
+        <!-- Movie Card -->
+        <div class="col-md-4 col-lg-3 d-flex align-items-stretch mb-4">
+            <div class="card h-100 shadow-sm">
+                <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ movie.title }}</h5>
+                    <div class="mb-2">
+                        {% for showtime in movie.showtime_set.all|slice:":3" %}
+                        <small class="text-muted d-block">
+                            {{ showtime.time }} ({{ showtime.date }})
+                        </small>
+                        {% endfor %}
                     </div>
-                </div>
-            </div>
-
-            <!-- Movie 2 -->
-            <div class="col-md-4 col-lg-3 d-flex align-items-stretch mb-4">
-                <div class="card h-100 shadow-sm">
-                    <img src="{% static 'images/blackwidow.jpg' %}" class="card-img-top" alt="Black Widow">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">Black Widow</h5>
-                        <p class="card-text">Show Times: 12:00 PM, 4:00 PM, 8:00 PM</p>
-                        <a href="#" class="btn btn-primary mt-auto">Book Now</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Movie 3 -->
-            <div class="col-md-4 col-lg-3 d-flex align-items-stretch mb-4">
-                <div class="card h-100 shadow-sm">
-                    <img src="{% static 'images/spiderman.jpg' %}" class="card-img-top" alt="Spider-Man">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">Spider-Man</h5>
-                        <p class="card-text">Show Times: 2:00 PM, 6:00 PM, 10:00 PM</p>
-                        <a href="#" class="btn btn-primary mt-auto">Book Now</a>
+                    <div class="mt-auto">
+                        {% with movie.showtime_set.first as showtime %}
+                        {% if showtime %}
+                        <a href="{% url 'book_now' showtime.id %}" class="btn btn-primary btn-sm w-100">Book Now</a>
+                        {% endif %}
+                        {% endwith %}
                     </div>
                 </div>
             </div>
         </div>
+        {% endfor %}
     </div>
+</div>
 
     <!-- Promotional Banner -->
     <div class="text-center mt-5 mb-5">

@@ -1,8 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .models import Showtime, Seat
+from .models import Showtime, Seat, Movie
 from .forms import BookingForm
-
+from django.utils import timezone
 
 @login_required
 def book_now(request, showtime_id):
@@ -45,3 +45,15 @@ def book_now(request, showtime_id):
 def home_view(request):
     movies = Movie.objects.all().prefetch_related('showtime_set')[:3]
     return render(request, 'booking_system/home.html', {'movies': movies})
+
+def movies_view(request):
+    current_date = timezone.now().date()
+    movies = Movie.objects.filter(release_date__lte=current_date)
+    upcoming_movies = Movie.objects.filter(release_date__gt=current_date)
+
+    context = {
+        'movies': movies,
+        'upcoming_movies': upcoming_movies,
+        'active_page': 'movies'  # Add this line
+    }
+    return render(request, 'movies/movies.html', context)

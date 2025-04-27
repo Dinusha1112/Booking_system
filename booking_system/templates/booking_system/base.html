@@ -12,16 +12,51 @@
     <link href="https://cdn.jsdelivr.net/npm/swiper/swiper-bundle.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
 
-    <!-- CSS -->
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <style>
+        /* Custom spacing adjustments */
+        .navbar {
+            padding: 0.8rem 0;
+        }
+
+        main {
+            padding-top: 2rem;
+            min-height: calc(100vh - 400px); /* Adjust based on footer height */
+        }
+
+        .navbar-brand {
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        /* Active nav item styling */
+        .navbar-dark .navbar-nav .nav-link.active {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+        }
+
+        @media (max-width: 992px) {
+            .navbar-collapse {
+                padding-top: 1rem;
+            }
+
+            .d-flex.align-items-center {
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<!-- Header Section (same as before) -->
+<!-- Header Section -->
 <header class="bg-dark text-white sticky-top">
     <div class="container">
         <nav class="navbar navbar-expand-lg navbar-dark">
-            <div class="container-fluid">
+            <div class="container-fluid px-0">  <!-- Remove default container padding -->
                 <a class="navbar-brand" href="{% url 'home' %}">
                     <span class="h3 text-danger">🎬 CineBook</span>
                 </a>
@@ -30,20 +65,24 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="{% url 'home' %}">Home</a>
+                        <li class="nav-item mx-1">  <!-- Added horizontal margin -->
+                            <a class="nav-link {% if request.resolver_match.view_name == 'home' %}active{% endif %}"
+                               href="{% url 'home' %}">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Movies</a>
+                        <li class="nav-item mx-1">
+                            <a class="nav-link {% if request.resolver_match.view_name == 'movies:movies' %}active{% endif %}"
+                               href="{% url 'movies:movies' %}">Movies</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Theaters</a>
+                        <li class="nav-item mx-1">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'theaters' %}active{% endif %}"
+                               href="#">Theaters</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Offers</a>
+                        <li class="nav-item mx-1">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'offers' %}active{% endif %}"
+                               href="#">Offers</a>
                         </li>
                     </ul>
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center ms-2">  <!-- Added margin start -->
                         {% if user.is_authenticated %}
                             <a href="{% url 'profile' %}" class="btn btn-outline-light me-2">
                                 <i class="bi bi-person-fill"></i> My Account
@@ -68,9 +107,9 @@
 
 <!-- Main Content -->
 <main class="flex-shrink-0">
-    <div class="container mt-4">
+    <div class="container py-3">
         {% block content %}
-            <h1 class="text-center mt-4">Welcome to the Online Movie Ticket Booking System</h1>
+            <h1 class="text-center my-4">Welcome to the Online Movie Ticket Booking System</h1>
         {% endblock %}
     </div>
 </main>
@@ -96,7 +135,7 @@
                 <h5>Quick Links</h5>
                 <ul class="list-unstyled">
                     <li class="mb-2"><a href="{% url 'home' %}" class="text-white text-decoration-none">Home</a></li>
-                    <li class="mb-2"><a href="#" class="text-white text-decoration-none">Movies</a></li>
+                    <li class="mb-2"><a href="{% url 'movies:movies' %}" class="text-white text-decoration-none">Movies</a></li>
                     <li class="mb-2"><a href="#" class="text-white text-decoration-none">Theaters</a></li>
                     <li class="mb-2"><a href="#" class="text-white text-decoration-none">Offers</a></li>
                     <li class="mb-2"><a href="#" class="text-white text-decoration-none">Contact Us</a></li>

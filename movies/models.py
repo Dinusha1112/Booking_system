@@ -7,6 +7,7 @@ class Movie(models.Model):
     poster = models.ImageField(upload_to='movies/images/')
     duration = models.DurationField()
     language = models.CharField(max_length=50)
+    release_date = models.DateField(null=True, blank=True)
     rating = models.DecimalField(max_digits=3, decimal_places=1)
 
     def __str__(self):

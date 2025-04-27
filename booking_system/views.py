@@ -42,3 +42,12 @@ def profile_view(request):
 def home_view(request):
     movies = Movie.objects.all()[:3]  # Get first 3 movies for the homepage
     return render(request, 'booking_system/home.html', {'movies': movies})
+
+from movies.models import Theater
+
+def theaters_view(request):
+    theaters = Theater.objects.all().prefetch_related('theaterfacility_set__facility', 'screen_set')
+    return render(request, 'booking_system/theaters.html', {
+        'theaters': theaters,
+        'active_page': 'theaters'
+    })

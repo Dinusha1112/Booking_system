@@ -57,3 +57,12 @@ def movies_view(request):
         'active_page': 'movies'  # Add this line
     }
     return render(request, 'movies/movies.html', context)
+
+from .models import Theater
+
+def theaters_view(request):
+    theaters = Theater.objects.prefetch_related('theaterfacility_set__facility', 'screen_set').all()
+    return render(request, 'booking_system/theaters.html', {
+        'theaters': theaters,
+        'active_page': 'theaters'
+    })

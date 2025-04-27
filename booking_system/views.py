@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegisterForm
 from movies.models import Movie
+from .models import UserProfile
 
 def register_view(request):
     if request.method == 'POST':
@@ -35,8 +36,10 @@ def logout_view(request):
 
 @login_required
 def profile_view(request):
+    user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+
     return render(request, 'booking_system/profile.html', {
-        'profile': request.user.userprofile
+        'profile': user_profile
     })
 
 def home_view(request):

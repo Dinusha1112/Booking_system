@@ -75,7 +75,7 @@
                         </li>
                         <li class="nav-item mx-1">
                             <a class="nav-link {% if request.resolver_match.url_name == 'theaters' %}active{% endif %}"
-                               href="#">Theaters</a>
+                               href="{% url 'theaters' %}">Theaters</a>
                         </li>
                         <li class="nav-item mx-1">
                             <a class="nav-link {% if request.resolver_match.url_name == 'offers' %}active{% endif %}"

@@ -6,7 +6,7 @@
 <section class="my-5">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Now Showing</h2>
+            <h2 class="fw-bold">Now Showing</h2>
             <a href="{% url 'movies:movies' %}#now-showing" class="btn btn-outline-primary">View More</a>
         </div>
 
@@ -14,18 +14,26 @@
             <div class="swiper-wrapper">
                 {% for movie in now_showing %}
                 <div class="swiper-slide">
-                    <div class="card h-100">
-                        <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ movie.title }}</h5>
-                            <p class="card-text">{{ movie.get_genre_display }}</p>
-                            <a href="{% url 'movies:movies' %}?movie={{ movie.id }}" class="btn btn-primary">Details</a>
+                    <a href="{% url 'movies:movies' %}?movie={{ movie.id }}" class="text-decoration-none">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="movie-poster-container">
+                                <img src="{{ movie.poster.url }}" class="card-img-top movie-poster" alt="{{ movie.title }}">
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-dark">{{ movie.title }}</h5>
+                                <p class="card-text text-muted">{{ movie.get_genre_display }}</p>
+                                <div class="d-grid">
+                                    <button class="btn btn-sm btn-outline-primary">View Details</button>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
                 {% endfor %}
             </div>
             <div class="swiper-pagination"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
         </div>
     </div>
 </section>
@@ -34,7 +42,7 @@
 <section class="my-5">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Coming Soon</h2>
+            <h2 class="fw-bold">Coming Soon</h2>
             <a href="{% url 'movies:movies' %}#coming-soon" class="btn btn-outline-primary">View More</a>
         </div>
 
@@ -42,17 +50,21 @@
             <div class="swiper-wrapper">
                 {% for movie in upcoming_movies %}
                 <div class="swiper-slide">
-                    <div class="card h-100">
-                        <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="movie-poster-container">
+                            <img src="{{ movie.poster.url }}" class="card-img-top movie-poster" alt="{{ movie.title }}">
+                        </div>
                         <div class="card-body">
                             <h5 class="card-title">{{ movie.title }}</h5>
-                            <p>Releases on {{ movie.release_date|date:"M d, Y" }}</p>
+                            <p class="text-muted">Releases on {{ movie.release_date|date:"M d, Y" }}</p>
                         </div>
                     </div>
                 </div>
                 {% endfor %}
             </div>
             <div class="swiper-pagination"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
         </div>
     </div>
 </section>
@@ -61,19 +73,21 @@
 <section class="my-5">
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Hot Deals</h2>
+            <h2 class="fw-bold">Hot Deals</h2>
             <a href="{% url 'offers' %}" class="btn btn-outline-primary">Check All Promotions</a>
         </div>
 
-        <div class="row">
+        <div class="row g-4">
             {% for promo in promotions %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow">
-                    <img src="{{ promo.image.url }}" class="card-img-top" alt="{{ promo.title }}">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="promo-image-container">
+                        <img src="{{ promo.image.url }}" class="card-img-top" alt="{{ promo.title }}">
+                    </div>
                     <div class="card-body">
                         <h5 class="card-title">{{ promo.title }}</h5>
-                        <p class="card-text">{{ promo.description }}</p>
-                        <div class="badge bg-success">{{ promo.discount_percentage }}% OFF</div>
+                        <p class="card-text text-muted">{{ promo.description }}</p>
+                        <div class="badge bg-success py-2 px-3">{{ promo.discount_percentage }}% OFF</div>
                     </div>
                 </div>
             </div>
@@ -81,7 +95,6 @@
         </div>
     </div>
 </section>
-
 {% endblock %}
 
 {% block extra_js %}
@@ -94,9 +107,14 @@ document.addEventListener('DOMContentLoaded', function() {
             el: '.swiper-pagination',
             clickable: true,
         },
+        navigation: {
+            nextEl: '.now-showing-swiper .swiper-button-next',
+            prevEl: '.now-showing-swiper .swiper-button-prev',
+        },
         breakpoints: {
-            768: { slidesPerView: 2 },
-            992: { slidesPerView: 3 }
+            576: { slidesPerView: 2 },
+            992: { slidesPerView: 3 },
+            1200: { slidesPerView: 4 }
         }
     });
 
@@ -107,9 +125,14 @@ document.addEventListener('DOMContentLoaded', function() {
             el: '.swiper-pagination',
             clickable: true,
         },
+        navigation: {
+            nextEl: '.coming-soon-swiper .swiper-button-next',
+            prevEl: '.coming-soon-swiper .swiper-button-prev',
+        },
         breakpoints: {
-            768: { slidesPerView: 2 },
-            992: { slidesPerView: 3 }
+            576: { slidesPerView: 2 },
+            992: { slidesPerView: 3 },
+            1200: { slidesPerView: 4 }
         }
     });
 });

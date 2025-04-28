@@ -45,7 +45,7 @@ class Command(BaseCommand):
                 defaults={
                     'location': theater_data['location'],
                     'contact': theater_data['contact'],
-                    'image': f'media/theaters/{theater_data["name"].lower().replace(" ", "_")}.jpg'
+                    'image': f'theaters/{theater_data["name"].lower().replace(" ", "_")}.jpg'
                 }
             )
 

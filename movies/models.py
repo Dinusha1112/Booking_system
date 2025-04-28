@@ -12,6 +12,12 @@ class Theater(models.Model):
     def __str__(self):
         return self.name
 
+class Genre(models.Model):
+    code = models.CharField(max_length=2, primary_key=True)
+    name = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.name
 
 class Movie(models.Model):
     GENRE_CHOICES = [
@@ -20,12 +26,25 @@ class Movie(models.Model):
         ('DR', 'Drama'),
         ('HO', 'Horror'),
         ('SF', 'Sci-Fi'),
+        ('RO', 'Romance'),
+        ('TH', 'Thriller'),
+        ('FA', 'Fantasy'),
+        ('HI', 'Historical'),
+        ('AD', 'Adventure')
+    ]
+
+    LANGUAGE_CHOICES = [
+        ('EN', 'English'),
+        ('SI', 'Sinhala'),
+        ('TA', 'Tamil'),
+        ('OT', 'Other')
     ]
 
     title = models.CharField(max_length=100)
     description = models.TextField()
     duration = models.IntegerField()  # in minutes
-    genre = models.CharField(max_length=2, choices=GENRE_CHOICES, null = True)
+    genres = models.ManyToManyField(Genre)
+    language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='EN')
     release_date = models.DateField()
     poster = models.ImageField(upload_to='movies/')
     rating = models.FloatField(default=0.0)
@@ -34,6 +53,8 @@ class Movie(models.Model):
     def __str__(self):
         return self.title
 
+    def get_genre_display(self):
+        return ", ".join([genre.name for genre in self.genres.all()])
 
 class Showtime(models.Model):
     movie = models.ForeignKey(Movie, on_delete=models.CASCADE)

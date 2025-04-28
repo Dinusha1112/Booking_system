@@ -1,0 +1,62 @@
+{% extends 'booking_system/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Booking for {{ showtime.movie.title }}</h2>
+            <p class="lead">
+                <strong>Theater:</strong> {{ showtime.theater.name }}<br>
+                <strong>Date:</strong> {{ showtime.date }}<br>
+                <strong>Time:</strong> {{ showtime.time|time:"g:i A" }}<br>
+                <strong>Price per seat:</strong> Rs. {{ showtime.price }}
+            </p>
+            
+            <form method="post">
+                {% csrf_token %}
+                <h4>Available Seats</h4>
+                <div class="mb-3">
+                    {{ form.seats.errors }}
+                    <div class="row">
+                        {% for seat in form.seats.field.queryset %}
+                        <div class="col-2 mb-2">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" 
+                                       name="seats" value="{{ seat.id }}" 
+                                       id="seat-{{ seat.id }}">
+                                <label class="form-check-label" for="seat-{{ seat.id }}">
+                                    {{ seat.row }}{{ seat.seat_number }}
+                                </label>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12">
+                            <p class="text-danger">No available seats for this showtime.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Confirm Booking</button>
+                <a href="{% url 'movies:movies' %}" class="btn btn-outline-secondary">Cancel</a>
+            </form>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <img src="{{ showtime.movie.poster.url }}" class="card-img-top" alt="{{ showtime.movie.title }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ showtime.movie.title }}</h5>
+                    <p class="card-text">{{ showtime.movie.description|truncatechars:150 }}</p>
+                    <p class="card-text">
+                        <small class="text-muted">
+                            {{ showtime.movie.duration }} mins | 
+                            {{ showtime.movie.get_genre_display }}
+                        </small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

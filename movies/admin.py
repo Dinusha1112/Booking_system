@@ -1,38 +1,19 @@
 from django.contrib import admin
-from .models import Movie, Showtime, Seat, Screen, Booking, BookedSeat
+from .models import Movie, Theater, Showtime, Booking
 
-class SeatInline(admin.TabularInline):
-    model = Seat
-    extra = 1
-
-class ScreenAdmin(admin.ModelAdmin):
-    inlines = [SeatInline]
-    list_display = ('theater', 'screen_number', 'screen_type', 'capacity')
-    list_filter = ('theater', 'screen_type')
-
-class ShowtimeInline(admin.TabularInline):
-    model = Showtime
-    extra = 1
 
 class MovieAdmin(admin.ModelAdmin):
-    inlines = [ShowtimeInline]
-    list_display = ('title', 'genre', 'release_date', 'rating')
-    list_filter = ('genre', 'release_date')
-    search_fields = ('title',)
+    list_display = ('title', 'get_genres_display', 'release_date', 'language')
+    list_filter = ('release_date', 'language')
+    filter_horizontal = ('genres',)
 
-class BookedSeatInline(admin.TabularInline):
-    model = BookedSeat
-    extra = 0
+    def get_genres_display(self, obj):
+        return ", ".join([genre.name for genre in obj.genres.all()])
 
-class BookingAdmin(admin.ModelAdmin):
-    inlines = [BookedSeatInline]
-    list_display = ('id', 'user', 'showtime', 'total_price', 'payment_status')
-    list_filter = ('payment_status', 'showtime__theater')
-    search_fields = ('user__username', 'showtime__movie__title')
+    get_genres_display.short_description = 'Genres'
+
 
 admin.site.register(Movie, MovieAdmin)
+admin.site.register(Theater)
 admin.site.register(Showtime)
-admin.site.register(Screen, ScreenAdmin)
-admin.site.register(Seat)
-admin.site.register(Booking, BookingAdmin)
-admin.site.register(BookedSeat)
+admin.site.register(Booking)

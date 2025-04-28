@@ -2,80 +2,158 @@
 {% load static %}
 
 {% block content %}
-    <div class="container mt-4">
-        <h1 class="text-center mt-4">Welcome to the Online Movie Ticket Booking System</h1>
+<!-- Now Showing Slider -->
+<section class="my-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Now Showing</h2>
+            <a href="{% url 'movies:movies' %}#now-showing" class="btn btn-outline-primary">View More</a>
+        </div>
 
-        {% if user.is_authenticated %}
-            <div class="text-center mt-3">
-                <p>Hello, {{ user.username }}!</p>
-                <a href="{% url 'profile' %}" class="btn btn-success me-2">View Profile</a>
-                <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+        <div class="swiper now-showing-swiper">
+            <div class="swiper-wrapper">
+                {% for movie in now_showing %}
+                <div class="swiper-slide">
+                    <a href="{% url 'movies:movies' %}?movie={{ movie.id }}" class="text-decoration-none">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="movie-poster-container">
+                                <img src="{{ movie.poster.url }}" class="card-img-top movie-poster" alt="{{ movie.title }}">
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-dark">{{ movie.title }}</h5>
+                                <p class="card-text text-muted">{{ movie.get_genre_display }}</p>
+                                <div class="d-grid">
+                                    <button class="btn btn-sm btn-outline-primary">View Details</button>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-4">
+                    <p class="text-muted">No movies currently showing</p>
+                </div>
+                {% endfor %}
             </div>
-        {% else %}
-            <div class="text-center mt-3">
-                <a href="{% url 'login' %}" class="btn btn-primary me-2">Login</a>
-                <a href="{% url 'register' %}" class="btn btn-secondary">Register</a>
-            </div>
-        {% endif %}
-    </div>
-
-<!-- Swiper Section (Carousel) -->
-<div class="swiper-container my-5">
-    <div class="swiper-wrapper">
-        <div class="swiper-slide">
-            <img src="{% static 'images/avengers.jpg' %}" class="img-fluid" alt="Banner 1">
-        </div>
-        <div class="swiper-slide">
-            <img src="{% static 'images/blackwidow.jpg' %}" class="img-fluid" alt="Banner 2">
-        </div>
-        <div class="swiper-slide">
-            <img src="{% static 'images/spiderman.jpg' %}" class="img-fluid" alt="Banner 3">
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
         </div>
     </div>
-    <!-- Add Pagination -->
-    <div class="swiper-pagination"></div>
-    <!-- Add Navigation -->
-    <div class="swiper-button-next"></div>
-    <div class="swiper-button-prev"></div>
-</div>
+</section>
 
-<!-- Now Showing Section -->
-<div class="container mt-5">
-    <h2 class="text-center mb-5">Now Showing 🎬</h2>
-    <div class="row justify-content-center">
-        {% for movie in movies %}
-        <!-- Movie Card -->
-        <div class="col-md-4 col-lg-3 d-flex align-items-stretch mb-4">
-            <div class="card h-100 shadow-sm">
-                <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}">
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">{{ movie.title }}</h5>
-                    <div class="mb-2">
-                        {% for showtime in movie.showtime_set.all|slice:":3" %}
-                        <small class="text-muted d-block">
-                            {{ showtime.time }} ({{ showtime.date }})
-                        </small>
-                        {% endfor %}
+<!-- Coming Soon Slider -->
+<section class="my-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Coming Soon</h2>
+            <a href="{% url 'movies:movies' %}#coming-soon" class="btn btn-outline-primary">View More</a>
+        </div>
+
+        <div class="swiper coming-soon-swiper">
+            <div class="swiper-wrapper">
+                {% for movie in upcoming_movies %}
+                <div class="swiper-slide">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="movie-poster-container">
+                            <img src="{{ movie.poster.url }}" class="card-img-top movie-poster" alt="{{ movie.title }}">
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{ movie.title }}</h5>
+                            <p class="text-muted">Releases on {{ movie.release_date|date:"M d, Y" }}</p>
+                        </div>
                     </div>
-                    <div class="mt-auto">
-                        {% with movie.showtime_set.first as showtime %}
-                        {% if showtime %}
-                        <a href="{% url 'book_now' showtime.id %}" class="btn btn-primary btn-sm w-100">Book Now</a>
-                        {% endif %}
-                        {% endwith %}
+                </div>
+                {% endfor %}
+            </div>
+            <div class="swiper-pagination"></div>
+            <div class="swiper-button-next"></div>
+            <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Hot Deals -->
+<section class="my-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">Hot Deals</h2>
+            <a href="{% url 'offers' %}" class="btn btn-outline-primary">Check All Promotions</a>
+        </div>
+
+        <div class="row g-4">
+            {% for promo in promotions %}
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="promo-image-container">
+                        <img src="{{ promo.image.url }}" class="card-img-top" alt="{{ promo.title }}">
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ promo.title }}</h5>
+                        <p class="card-text text-muted">{{ promo.description }}</p>
+                        <div class="badge bg-success py-2 px-3">{{ promo.discount_percentage }}% OFF</div>
                     </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
-</div>
-
-    <!-- Promotional Banner -->
-    <div class="text-center mt-5 mb-5">
-        <h3>Exclusive Offer!</h3>
-        <p>Get 50% off on your first booking! Use code <strong>MOVIE50</strong> at checkout.</p>
-        <a href="#" class="btn btn-warning">Book Now</a>
-    </div>
+</section>
 {% endblock %}
-#hp creation
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const nowShowingSwiper = new Swiper('.now-showing-swiper', {
+        slidesPerView: 1,
+        spaceBetween: 20,
+        loop: true,
+        autoplay: {
+            delay: 3000,  // 3 seconds between slides
+            disableOnInteraction: false,  // Continue autoplay after user interaction
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+        navigation: {
+            nextEl: '.now-showing-swiper .swiper-button-next',
+            prevEl: '.now-showing-swiper .swiper-button-prev',
+        },
+        breakpoints: {
+            576: { slidesPerView: 2 },
+            992: { slidesPerView: 3 },
+            1200: { slidesPerView: 4 }
+        }
+    });
+
+    const comingSoonSwiper = new Swiper('.coming-soon-swiper', {
+        slidesPerView: 1,
+        spaceBetween: 20,
+        loop: false,
+        autoplay: {
+            delay: 3500,  // 3.5 seconds between slides (slightly different timing)
+            disableOnInteraction: false,
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+        navigation: {
+            nextEl: '.coming-soon-swiper .swiper-button-next',
+            prevEl: '.coming-soon-swiper .swiper-button-prev',
+        },
+        breakpoints: {
+            576: { slidesPerView: 2 },
+            992: { slidesPerView: 3 },
+            1200: { slidesPerView: 4 }
+        }
+    });
+});
+
+// Disable autoplay if we have fewer than 4 movies
+if (document.querySelectorAll('.coming-soon-swiper .swiper-slide:not(.swiper-slide-duplicate)').length < 4) {
+    comingSoonSwiper.autoplay.stop();
+}
+</script>
+{% endblock %}

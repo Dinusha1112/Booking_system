@@ -10,4 +10,9 @@ class BookingForm(forms.ModelForm):
         showtime = kwargs.pop('showtime', None)
         super().__init__(*args, **kwargs)
         if showtime:
-            self.fields['seats'].queryset = Seat.objects.filter(is_booked=False)
+            screen = showtime.theater.screen_set.first()
+            if screen:
+                self.fields['seats'].queryset = Seat.objects.filter(
+                    screen=screen,
+                    is_booked=False
+                )

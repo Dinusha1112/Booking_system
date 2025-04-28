@@ -1,0 +1,34 @@
+{% extends 'booking_system/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-5">Our Theaters</h1>
+    
+    <div class="row g-4">
+        {% for theater in theaters %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow">
+                <img src="{{ theater.image.url }}" class="card-img-top" alt="{{ theater.name }}">
+                <div class="card-body">
+                    <h3 class="card-title">{{ theater.name }}</h3>
+                    <p class="text-muted">
+                        <i class="bi bi-geo-alt-fill"></i> {{ theater.location }}
+                    </p>
+                    <p><i class="bi bi-telephone-fill"></i> {{ theater.contact }}</p>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <a href="{% url 'movies:movies' %}?theater={{ theater.id }}" class="btn btn-danger">
+                            View Movies
+                        </a>
+                        <a href="#" class="btn btn-outline-secondary">
+                            <i class="bi bi-map"></i> Get Directions
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

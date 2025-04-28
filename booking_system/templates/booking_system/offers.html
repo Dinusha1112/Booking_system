@@ -1,0 +1,27 @@
+{% extends 'booking_system/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-5">Special Offers</h1>
+
+    <div class="row">
+        {% for promo in promotions %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow">
+                <img src="{{ promo.image.url }}" class="card-img-top" alt="{{ promo.title }}">
+                <div class="card-body">
+                    <h3 class="card-title">{{ promo.title }}</h3>
+                    <div class="badge bg-success mb-3">{{ promo.discount_percentage }}% OFF</div>
+                    <p class="card-text">{{ promo.description }}</p>
+                    <p class="text-muted">Valid from {{ promo.start_date|date:"M d" }} to {{ promo.end_date|date:"M d, Y" }}</p>
+                </div>
+                <div class="card-footer bg-white">
+                    <button class="btn btn-danger w-100">Get This Offer</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

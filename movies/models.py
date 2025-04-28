@@ -32,7 +32,6 @@ class Movie(models.Model):
         ('HI', 'Historical'),
         ('AD', 'Adventure')
     ]
-
     LANGUAGE_CHOICES = [
         ('EN', 'English'),
         ('SI', 'Sinhala'),

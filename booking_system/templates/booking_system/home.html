@@ -29,6 +29,10 @@
                         </div>
                     </a>
                 </div>
+                {% empty %}
+                <div class="col-12 text-center py-4">
+                    <p class="text-muted">No movies currently showing</p>
+                </div>
                 {% endfor %}
             </div>
             <div class="swiper-pagination"></div>
@@ -103,6 +107,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const nowShowingSwiper = new Swiper('.now-showing-swiper', {
         slidesPerView: 1,
         spaceBetween: 20,
+        loop: true,
+        autoplay: {
+            delay: 3000,  // 3 seconds between slides
+            disableOnInteraction: false,  // Continue autoplay after user interaction
+        },
         pagination: {
             el: '.swiper-pagination',
             clickable: true,
@@ -121,6 +130,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const comingSoonSwiper = new Swiper('.coming-soon-swiper', {
         slidesPerView: 1,
         spaceBetween: 20,
+        loop: false,
+        autoplay: {
+            delay: 3500,  // 3.5 seconds between slides (slightly different timing)
+            disableOnInteraction: false,
+        },
         pagination: {
             el: '.swiper-pagination',
             clickable: true,
@@ -136,5 +150,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// Disable autoplay if we have fewer than 4 movies
+if (document.querySelectorAll('.coming-soon-swiper .swiper-slide:not(.swiper-slide-duplicate)').length < 4) {
+    comingSoonSwiper.autoplay.stop();
+}
 </script>
 {% endblock %}

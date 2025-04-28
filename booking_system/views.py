@@ -9,22 +9,31 @@ from movies.models import Movie, Theater
 
 
 def home_view(request):
-    theaters = Theater.objects.all()
+    # Get one movie per genre for now showing
     now_showing = []
-    for theater in theaters:
-        now_showing.extend(Movie.objects.filter(
-            showtime__theater=theater
-        ).distinct()[:2])
+    for genre_code, _ in Movie.GENRE_CHOICES:
+        movie = Movie.objects.filter(
+            showtime__date__gte=timezone.now().date(),  # Only movies with upcoming showtimes
+            genres__code=genre_code
+        ).distinct().first()  # Get first movie for each genre
+        if movie:
+            now_showing.append(movie)
 
-    upcoming_movies = Movie.objects.filter(release_date__gt=timezone.now().date())[:4]
-    promotions = Promotion.objects.filter(is_active=True)[:3]
+    upcoming_movies = Movie.objects.filter(
+        release_date__gt=timezone.now().date()
+    ).order_by('release_date')[:4]
+
+    promotions = Promotion.objects.filter(
+        is_active=True,
+        start_date__lte=timezone.now().date(),
+        end_date__gte=timezone.now().date()
+    )[:3]
 
     return render(request, 'booking_system/home.html', {
         'now_showing': now_showing,
         'upcoming_movies': upcoming_movies,
         'promotions': promotions
     })
-
 
 def contact_view(request):
     if request.method == 'POST':

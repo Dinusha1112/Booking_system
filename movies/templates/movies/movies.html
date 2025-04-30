@@ -32,43 +32,28 @@
         <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
             {% for movie in now_showing %}
             <div class="col">
-                <div class="card h-100 shadow">
-                    <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 400px; object-fit: cover;">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ movie.title }}</h5>
-                        <div class="mb-2">
-                            <span class="badge bg-dark me-1">{{ movie.get_genre_display }}</span>
-                            <span class="text-muted">{{ movie.duration }} mins</span>
-                        </div>
-                        <p class="card-text text-muted small">{{ movie.description|truncatechars:100 }}</p>
-
-                        <div class="mt-3">
-                            <h6>Showtimes:</h6>
-                            <div class="d-flex flex-wrap gap-2">
-                                {% with movie.showtime_set.all|dictsort:"time" as showtimes %}
-                                    {% for showtime in showtimes %}
-                                        {% if not selected_theater or showtime.theater.id == selected_theater %}
-                                        <a href="{% url 'movies:booking' showtime.id %}" class="btn btn-sm btn-outline-primary">
-                                            {{ showtime.time|time:"g:i A" }}
-                                        </a>
-                                        {% endif %}
-                                    {% empty %}
-                                        <span class="text-muted small">No showtimes available</span>
-                                    {% endfor %}
-                                {% endwith %}
+                {% with movie.showtime_set.first as first_showtime %}
+                <a href="{% if first_showtime %}{% url 'movies:booking' first_showtime.id %}{% else %}#{% endif %}" class="text-decoration-none">
+                    <div class="card h-100 shadow">
+                        <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 400px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ movie.title }}</h5>
+                            <div class="mb-2">
+                                <span class="badge bg-dark me-1">{{ movie.get_genre_display }}</span>
+                                <span class="text-muted">{{ movie.duration }} mins</span>
                             </div>
+                            <p class="card-text text-muted small">{{ movie.description|truncatechars:100 }}</p>
+                        </div>
+                        <div class="card-footer bg-white">
+                            {% if first_showtime %}
+                                <span class="btn btn-danger w-100">Book Now</span>
+                            {% else %}
+                                <span class="btn btn-secondary w-100" disabled>No Showtimes</span>
+                            {% endif %}
                         </div>
                     </div>
-                    <div class="card-footer bg-white">
-                        {% with movie.showtime_set.first as first_showtime %}
-                            {% if first_showtime %}
-                            <a href="{% url 'movies:booking' first_showtime.id %}" class="btn btn-danger w-100">Book Now</a>
-                            {% else %}
-                            <button class="btn btn-secondary w-100" disabled>No Showtimes</button>
-                            {% endif %}
-                        {% endwith %}
-                    </div>
-                </div>
+                </a>
+                {% endwith %}
             </div>
             {% endfor %}
         </div>
@@ -86,17 +71,19 @@
         <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
             {% for movie in coming_soon %}
             <div class="col">
-                <div class="card h-100 shadow">
-                    <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 400px; object-fit: cover;">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ movie.title }}</h5>
-                        <div class="mb-2">
-                            <span class="badge bg-secondary me-1">{{ movie.get_genre_display }}</span>
-                            <span class="text-muted">Coming {{ movie.release_date|date:"M d, Y" }}</span>
+                <a href="{% url 'movies:movies' %}?movie={{ movie.id }}" class="text-decoration-none">
+                    <div class="card h-100 shadow">
+                        <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 400px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ movie.title }}</h5>
+                            <div class="mb-2">
+                                <span class="badge bg-secondary me-1">{{ movie.get_genre_display }}</span>
+                                <span class="text-muted">Coming {{ movie.release_date|date:"M d, Y" }}</span>
+                            </div>
+                            <span class="btn btn-outline-secondary w-100 mt-2">Notify Me</span>
                         </div>
-                        <button class="btn btn-outline-secondary w-100 mt-2" disabled>Notify Me</button>
                     </div>
-                </div>
+                </a>
             </div>
             {% endfor %}
         </div>

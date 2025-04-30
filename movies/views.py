@@ -9,9 +9,21 @@ def movies_view(request):
     now_showing = Movie.objects.filter(release_date__lte=current_date)
     coming_soon = Movie.objects.filter(release_date__gt=current_date)
 
+    # Search functionality
+    search_query = request.GET.get('q')
+    if search_query:
+        now_showing = now_showing.filter(title__icontains=search_query)
+        coming_soon = coming_soon.filter(title__icontains=search_query)
+
+    # Genre filter
+    genre_filter = request.GET.get('genre')
+    if genre_filter:
+        now_showing = now_showing.filter(genres__name=genre_filter)
+        coming_soon = coming_soon.filter(genres__name=genre_filter)
+
+    # Theater filter (existing code)
     theater_id = request.GET.get('theater')
     selected_theater_name = None
-
     if theater_id:
         now_showing = now_showing.filter(showtime__theater_id=theater_id).distinct()
         try:

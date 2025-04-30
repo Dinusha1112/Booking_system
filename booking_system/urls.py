@@ -1,7 +1,5 @@
-
-
 from django.urls import path
-from booking_system import views
+from . import views
 
 urlpatterns = [
     path('', views.home_view, name='home'),
@@ -9,6 +7,6 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
     path('profile/', views.profile_view, name='profile'),
-    path('theaters/', views.theaters_view, name='theaters'),
+    path('contact/', views.contact_view, name='contact'),
+    path('offers/', views.offers_view, name='offers'),
 ]
-

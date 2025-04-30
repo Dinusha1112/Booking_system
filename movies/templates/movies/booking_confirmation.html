@@ -1,0 +1,30 @@
+{% extends 'booking_system/base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="alert alert-success">
+        <h2>Booking Confirmed!</h2>
+        <p>Your booking reference is: <strong>#{{ booking.id }}</strong></p>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <h3>{{ booking.showtime.movie.title }}</h3>
+            <p>
+                <strong>Theater:</strong> {{ booking.showtime.theater.name }}<br>
+                <strong>Date:</strong> {{ booking.showtime.date }}<br>
+                <strong>Time:</strong> {{ booking.showtime.time|time:"g:i A" }}<br>
+                <strong>Seats:</strong> 
+                {% for booked_seat in booking.bookedseat_set.all %}
+                    {{ booked_seat.seat }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}<br>
+                <strong>Total Price:</strong> Rs. {{ booking.total_price }}
+            </p>
+            
+            <a href="{% url 'movies:movies' %}" class="btn btn-primary">
+                Back to Movies
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

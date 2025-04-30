@@ -2,128 +2,92 @@
 {% load static %}
 
 {% block content %}
-<div class="container mt-5">
-    <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="mb-0">Now Showing</h1>
-        <div class="dropdown">
-            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown">
-                Filter by Genre
-            </button>
-            <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="#">All Genres</a></li>
-                <li><a class="dropdown-item" href="#">Action</a></li>
-                <li><a class="dropdown-item" href="#">Comedy</a></li>
-                <li><a class="dropdown-item" href="#">Drama</a></li>
-                <li><a class="dropdown-item" href="#">Sci-Fi</a></li>
-            </ul>
+<div class="container my-5">
+    <!-- Now Showing Section -->
+    <section id="now-showing" class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Now Showing</h1>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    {% if selected_theater %}
+                        {{ selected_theater_name|default:"Unknown Theater" }}
+                    {% else %}
+                        All Theaters
+                    {% endif %}
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'movies:movies' %}">All Theaters</a></li>
+                    {% for theater in theaters %}
+                    <li><a class="dropdown-item" href="{% url 'movies:movies' %}?theater={{ theater.id }}">{{ theater.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
-    </div>
 
-    <!-- Movies Grid -->
-    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-        {% for movie in movies %}
-        <div class="col">
-            <div class="card h-100 shadow-sm">
-                <!-- Movie Poster -->
-                <div class="position-relative">
-                    <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}">
-                    <div class="position-absolute top-0 end-0 bg-danger text-white px-2 py-1 m-2 rounded">
-                        {{ movie.rating }}
-                    </div>
-                </div>
-                
-                <div class="card-body d-flex flex-column">
-                    <!-- Movie Title and Info -->
-                    <h5 class="card-title">{{ movie.title }}</h5>
-                    <div class="mb-2">
-                        <span class="badge bg-dark me-1">{{ movie.genre }}</span>
-                        <span class="text-muted">{{ movie.duration }} mins</span>
-                    </div>
-                    <p class="card-text text-muted small">{{ movie.description|truncatechars:100 }}</p>
-                    
-                    <!-- Showtimes -->
-                    <div class="mt-auto">
-                        <h6 class="mt-3 mb-2">Available Shows:</h6>
-                        <div class="d-flex flex-wrap gap-2">
-                            {% for showtime in movie.showtime_set.all|slice:":3" %}
-                            <a href="{% url 'book_now' showtime.id %}" class="btn btn-sm btn-outline-primary">
-                                {{ showtime.time|time:"g:i A" }}
-                            </a>
-                            {% endfor %}
-                            {% if movie.showtime_set.count > 3 %}
-                            <a href="#" class="btn btn-sm btn-outline-secondary">+{{ movie.showtime_set.count|add:"-3" }} more</a>
+        {% if not now_showing %}
+        <div class="alert alert-info">
+            No movies currently showing at the selected theater.
+        </div>
+        {% else %}
+        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+            {% for movie in now_showing %}
+            <div class="col">
+                {% with movie.showtime_set.first as first_showtime %}
+                <a href="{% if first_showtime %}{% url 'movies:booking' first_showtime.id %}{% else %}#{% endif %}" class="text-decoration-none">
+                    <div class="card h-100 shadow">
+                        <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 400px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ movie.title }}</h5>
+                            <div class="mb-2">
+                                <span class="badge bg-dark me-1">{{ movie.get_genre_display }}</span>
+                                <span class="text-muted">{{ movie.duration }} mins</span>
+                            </div>
+                            <p class="card-text text-muted small">{{ movie.description|truncatechars:100 }}</p>
+                        </div>
+                        <div class="card-footer bg-white">
+                            {% if first_showtime %}
+                                <span class="btn btn-danger w-100">Book Now</span>
+                            {% else %}
+                                <span class="btn btn-secondary w-100" disabled>No Showtimes</span>
                             {% endif %}
                         </div>
                     </div>
-                </div>
-                
-                <!-- Book Now Button -->
-                <div class="card-footer bg-white border-0">
-                    {% with movie.showtime_set.first as showtime %}
-                    {% if showtime %}
-                    <a href="{% url 'book_now' showtime.id %}" class="btn btn-danger w-100">Book Now</a>
-                    {% endif %}
-                    {% endwith %}
-                </div>
+                </a>
+                {% endwith %}
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-</div>
+        {% endif %}
+    </section>
 
-<!-- Upcoming Movies Section -->
-<div class="container mt-5 pt-5">
-    <h2 class="mb-4">Coming Soon</h2>
-    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-        {% for movie in upcoming_movies %}
-        <div class="col">
-            <div class="card h-100 shadow-sm">
-                <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}">
-                <div class="card-body">
-                    <h5 class="card-title">{{ movie.title }}</h5>
-                    <div class="mb-2">
-                        <span class="badge bg-secondary me-1">{{ movie.genre }}</span>
-                        <span class="text-muted">Coming {{ movie.release_date|date:"M d" }}</span>
+    <!-- Coming Soon Section -->
+    <section id="coming-soon" class="mt-5 pt-5">
+        <h2 class="mb-4">Coming Soon</h2>
+        {% if not coming_soon %}
+        <div class="alert alert-info">
+            No upcoming movies announced yet.
+        </div>
+        {% else %}
+        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+            {% for movie in coming_soon %}
+            <div class="col">
+                <a href="{% url 'movies:movies' %}?movie={{ movie.id }}" class="text-decoration-none">
+                    <div class="card h-100 shadow">
+                        <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 400px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ movie.title }}</h5>
+                            <div class="mb-2">
+                                <span class="badge bg-secondary me-1">{{ movie.get_genre_display }}</span>
+                                <span class="text-muted">Coming {{ movie.release_date|date:"M d, Y" }}</span>
+                            </div>
+                            <span class="btn btn-outline-secondary w-100 mt-2">Notify Me</span>
+                        </div>
                     </div>
-                    <button class="btn btn-outline-secondary w-100 mt-2" disabled>Notify Me</button>
-                </div>
+                </a>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
+        {% endif %}
+    </section>
 </div>
-{% endblock %}
-
-{% block extra_css %}
-<style>
-    .card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        border: none;
-        border-radius: 10px;
-        overflow: hidden;
-    }
-    
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-    }
-    
-    .card-img-top {
-        height: 350px;
-        object-fit: cover;
-    }
-    
-    .badge {
-        font-weight: 500;
-    }
-</style>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Add any interactive functionality here
-});
-</script>
 {% endblock %}

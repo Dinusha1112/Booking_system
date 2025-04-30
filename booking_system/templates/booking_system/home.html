@@ -14,7 +14,8 @@
             <div class="swiper-wrapper">
                 {% for movie in now_showing %}
                 <div class="swiper-slide">
-                    <a href="{% url 'movies:movies' %}?movie={{ movie.id }}" class="text-decoration-none">
+                    {% with showtime=movie.showtime_set.first %}
+                    <a href="{% if showtime %}{% url 'movies:booking' showtime.id %}{% else %}#{% endif %}" class="text-decoration-none">
                         <div class="card h-100 border-0 shadow-sm">
                             <div class="movie-poster-container">
                                 <img src="{{ movie.poster.url }}" class="card-img-top movie-poster" alt="{{ movie.title }}">
@@ -23,11 +24,16 @@
                                 <h5 class="card-title text-dark">{{ movie.title }}</h5>
                                 <p class="card-text text-muted">{{ movie.get_genre_display }}</p>
                                 <div class="d-grid">
-                                    <button class="btn btn-sm btn-outline-primary">View Details</button>
+                                    {% if showtime %}
+                                        <span class="btn btn-sm btn-danger">Book Now</span>
+                                    {% else %}
+                                        <span class="btn btn-sm btn-secondary" disabled>No Showtimes</span>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
                     </a>
+                    {% endwith %}
                 </div>
                 {% empty %}
                 <div class="col-12 text-center py-4">
@@ -47,7 +53,7 @@
     <div class="container">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold">Coming Soon</h2>
-            <a href="{% url 'movies:movies' %}#coming-soon" class="btn btn-outline-primary">View More</a>
+            <a href="{% url 'movies:movies' %}" class="btn btn-outline-primary">View More</a>
         </div>
 
         <div class="swiper coming-soon-swiper">

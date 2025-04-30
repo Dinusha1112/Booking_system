@@ -33,6 +33,7 @@ def theaters_view(request):
         'theaters': theaters
     })
 
+
 @login_required
 def booking_view(request, showtime_id):
     showtime = get_object_or_404(Showtime, id=showtime_id)
@@ -40,23 +41,20 @@ def booking_view(request, showtime_id):
     if request.method == 'POST':
         form = BookingForm(request.POST, showtime=showtime)
         if form.is_valid():
-            # Create booking
             booking = Booking(
                 user=request.user,
                 showtime=showtime,
                 total_price=showtime.price * len(form.cleaned_data['seats']),
-                payment_status=True  # Assuming payment is processed immediately
+                payment_status=True
             )
             booking.save()
 
-            # Book the seats
             for seat in form.cleaned_data['seats']:
                 seat.is_booked = True
                 seat.save()
                 BookedSeat.objects.create(booking=booking, seat=seat)
 
-            # Redirect to confirmation page
-            return redirect('booking_confirmation', booking_id=booking.id)
+            return redirect('movies:booking_confirmation', booking_id=booking.id)
     else:
         form = BookingForm(showtime=showtime)
 

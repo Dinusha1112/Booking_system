@@ -9,10 +9,9 @@ from movies.models import Movie, Theater
 
 
 def home_view(request):
-    # Get distinct movies that have upcoming showtimes
     now_showing = Movie.objects.filter(
-        showtime__date__gte=timezone.now().date()  # Only movies with upcoming showtimes
-    ).distinct().order_by('title')[:8]  # Limit to 8 movies and order by title
+        showtime__date__gte=timezone.now().date()
+    ).distinct().order_by('title')[:8]
 
     upcoming_movies = Movie.objects.filter(
         release_date__gt=timezone.now().date()
@@ -29,6 +28,7 @@ def home_view(request):
         'upcoming_movies': upcoming_movies,
         'promotions': promotions
     })
+
 def contact_view(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)

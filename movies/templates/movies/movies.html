@@ -6,7 +6,7 @@
     <!-- Search and Filter Section -->
     <section class="mb-4">
         <div class="row">
-            <div class="col-md-6 mb-3 mb-md-0">
+            <div class="col-md-5 mb-3 mb-md-0">
                 <form method="get" action="{% url 'movies:movies' %}">
                     <div class="input-group">
                         <input type="text" class="form-control" name="q" placeholder="Search movies..."
@@ -23,26 +23,63 @@
                     {% endif %}
                 </form>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-5">
                 <div class="dropdown">
                     <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
                         {% if request.GET.genre %}
-                            Filter: {{ request.GET.genre }}
+                            Genre: {{ request.GET.genre }}
                         {% else %}
-                            Filter by Genre
+                            All Genres
                         {% endif %}
                     </button>
                     <ul class="dropdown-menu w-100">
                         <li><a class="dropdown-item" href="{% url 'movies:movies' %}?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.theater %}theater={{ request.GET.theater }}{% endif %}">All Genres</a></li>
-                        {% for code, name in movie.GENRE_CHOICES %}
+                        {% for code, name in GENRE_CHOICES %}
                         <li><a class="dropdown-item" href="{% url 'movies:movies' %}?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.theater %}theater={{ request.GET.theater }}&{% endif %}genre={{ name }}">{{ name }}</a></li>
                         {% endfor %}
                     </ul>
                 </div>
             </div>
+            <div class="col-md-2">
+                <a href="{% url 'movies:movies' %}?clear=1" class="btn btn-outline-danger w-100">
+                    <i class="bi bi-x-circle"></i> Clear Filters
+                </a>
+            </div>
         </div>
+
+        <!-- Active Filters Display -->
+        {% if request.GET.q or request.GET.genre or request.GET.theater %}
+        <div class="mt-3">
+            <small class="text-muted">Active filters:</small>
+            {% if request.GET.q %}
+            <span class="badge bg-primary me-1">
+                Search: "{{ request.GET.q }}"
+                <a href="?{% if request.GET.genre %}genre={{ request.GET.genre }}&{% endif %}{% if request.GET.theater %}theater={{ request.GET.theater }}{% endif %}" class="text-white ms-1">
+                    <i class="bi bi-x"></i>
+                </a>
+            </span>
+            {% endif %}
+            {% if request.GET.genre %}
+            <span class="badge bg-primary me-1">
+                Genre: {{ request.GET.genre }}
+                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.theater %}theater={{ request.GET.theater }}{% endif %}" class="text-white ms-1">
+                    <i class="bi bi-x"></i>
+                </a>
+            </span>
+            {% endif %}
+            {% if request.GET.theater %}
+            <span class="badge bg-primary me-1">
+                Theater: {{ selected_theater_name }}
+                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}{% if request.GET.genre %}genre={{ request.GET.genre }}{% endif %}" class="text-white ms-1">
+                    <i class="bi bi-x"></i>
+                </a>
+            </span>
+            {% endif %}
+        </div>
+        {% endif %}
     </section>
+
     <!-- Now Showing Section -->
     <section id="now-showing" class="mb-5">
         <div class="d-flex justify-content-between align-items-center mb-4">

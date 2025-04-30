@@ -9,6 +9,10 @@ def movies_view(request):
     now_showing = Movie.objects.filter(release_date__lte=current_date)
     coming_soon = Movie.objects.filter(release_date__gt=current_date)
 
+    # Clear filters if requested
+    if 'clear' in request.GET:
+        return redirect('movies:movies')
+
     # Search functionality
     search_query = request.GET.get('q')
     if search_query:
@@ -21,7 +25,7 @@ def movies_view(request):
         now_showing = now_showing.filter(genres__name=genre_filter)
         coming_soon = coming_soon.filter(genres__name=genre_filter)
 
-    # Theater filter (existing code)
+    # Theater filter
     theater_id = request.GET.get('theater')
     selected_theater_name = None
     if theater_id:
@@ -36,7 +40,8 @@ def movies_view(request):
         'coming_soon': coming_soon,
         'theaters': Theater.objects.all(),
         'selected_theater': int(theater_id) if theater_id else None,
-        'selected_theater_name': selected_theater_name
+        'selected_theater_name': selected_theater_name,
+        'GENRE_CHOICES': Movie.GENRE_CHOICES
     })
 
 def theaters_view(request):

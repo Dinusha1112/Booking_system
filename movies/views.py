@@ -20,10 +20,14 @@ def movies_view(request):
         coming_soon = coming_soon.filter(title__icontains=search_query)
 
     # Genre filter
-    genre_filter = request.GET.get('genre')
+    genre_filter = request.GET.get('genres')
     if genre_filter:
-        now_showing = now_showing.filter(genres__name=genre_filter)
-        coming_soon = coming_soon.filter(genres__name=genre_filter)
+        genres = [g.strip() for g in genre_filter.split(',') if g.strip()]
+        if genres:
+            # Filter for movies that have ALL selected genres
+            for genre in genres:
+                now_showing = now_showing.filter(genres__name=genre)
+                coming_soon = coming_soon.filter(genres__name=genre)
 
     # Theater filter
     theater_id = request.GET.get('theater')
@@ -86,3 +90,4 @@ def booking_confirmation(request, booking_id):
     return render(request, 'movies/booking_confirmation.html', {
         'booking': booking
     })
+

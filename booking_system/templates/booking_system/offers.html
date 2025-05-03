@@ -3,25 +3,514 @@
 
 {% block content %}
 <div class="container my-5">
-    <h1 class="text-center mb-5">Special Offers</h1>
+    <h1 class="fw-bold mb-4">Special Offers & Promotions</h1>
 
-    <div class="row">
-        {% for promo in promotions %}
-        <div class="col-md-4 mb-4">
-            <div class="card h-100 shadow">
-                <img src="{{ promo.image.url }}" class="card-img-top" alt="{{ promo.title }}">
-                <div class="card-body">
-                    <h3 class="card-title">{{ promo.title }}</h3>
-                    <div class="badge bg-success mb-3">{{ promo.discount_percentage }}% OFF</div>
-                    <p class="card-text">{{ promo.description }}</p>
-                    <p class="text-muted">Valid from {{ promo.start_date|date:"M d" }} to {{ promo.end_date|date:"M d, Y" }}</p>
+    <!-- Bank Card Offers Section -->
+    <section class="mb-5">
+        <h2 class="fw-bold mb-4">Bank Card Offers</h2>
+        <div class="row g-4">
+            <!-- Sampath Bank -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-img-top bg-primary text-white p-4 text-center">
+                        <i class="bi bi-credit-card-2-front" style="font-size: 3rem;"></i>
+                        <h4 class="mt-3">Sampath Bank</h4>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">25% Off on Weekdays</h5>
+                        <p class="card-text">Get 25% discount on movie tickets when you pay with your Sampath Visa card on weekdays.</p>
+                        <div class="badge bg-success py-2 px-3 mb-2">Valid until Dec 31, 2025</div>
+                        <button class="btn btn-outline-primary w-100" data-bs-toggle="modal" data-bs-target="#sampathModal">
+                            More Info
+                        </button>
+                    </div>
                 </div>
-                <div class="card-footer bg-white">
-                    <button class="btn btn-danger w-100">Get This Offer</button>
+            </div>
+
+            <!-- HSBC -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-img-top bg-danger text-white p-4 text-center">
+                        <i class="bi bi-credit-card" style="font-size: 3rem;"></i>
+                        <h4 class="mt-3">HSBC</h4>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">1+1 Free Tickets</h5>
+                        <p class="card-text">Buy one ticket and get one free every Friday with your HSBC credit card.</p>
+                        <div class="badge bg-success py-2 px-3 mb-2">Valid until Oct 31, 2025</div>
+                        <button class="btn btn-outline-danger w-100" data-bs-toggle="modal" data-bs-target="#hsbcModal">
+                            More Info
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NTB -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-img-top bg-warning text-dark p-4 text-center">
+                        <i class="bi bi-credit-card-fill" style="font-size: 3rem;"></i>
+                        <h4 class="mt-3">NTB</h4>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Free Popcorn Combo</h5>
+                        <p class="card-text">Get a free popcorn and drink combo with every ticket purchased using NTB debit cards.</p>
+                        <div class="badge bg-success py-2 px-3 mb-2">Valid until Nov 30, 2025</div>
+                        <button class="btn btn-outline-warning w-100" data-bs-toggle="modal" data-bs-target="#ntbModal">
+                            More Info
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-        {% endfor %}
+    </section>
+
+    <!-- Special Deals Section -->
+    <section class="mb-5">
+        <h2 class="fw-bold mb-4">Special Deals</h2>
+        <div class="row g-4">
+            <!-- SLASH Offer -->
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-primary text-white rounded-circle p-3 me-3">
+                                <i class="bi bi-percent" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <h4 class="card-title mb-0">Scope Cinema is on SLASH!</h4>
+                        </div>
+                        <p class="card-text">Enjoy exclusive discounts when you book through the SLASH app.</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="badge bg-info py-2 px-3">New Offer</div>
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#slashModal">
+                                More Info
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rewards Card -->
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-success text-white rounded-circle p-3 me-3">
+                                <i class="bi bi-stars" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <h4 class="card-title mb-0">THE REWARDS CARD – OG EDITION</h4>
+                        </div>
+                        <p class="card-text">Spend, Earn and Redeem points with every purchase.</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="badge bg-danger py-2 px-3">Popular</div>
+                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#rewardsModal">
+                                More Info
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Offer -->
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-info text-white rounded-circle p-3 me-3">
+                                <i class="bi bi-mortarboard" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <h4 class="card-title mb-0">Student Special</h4>
+                        </div>
+                        <p class="card-text">50% off for students on weekdays.</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="badge bg-warning text-dark py-2 px-3">Limited Time</div>
+                            <button class="btn btn-info" data-bs-toggle="modal" data-bs-target="#studentModal">
+                                More Info
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Family Package -->
+            <div class="col-md-6">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-purple text-white rounded-circle p-3 me-3">
+                                <i class="bi bi-people" style="font-size: 1.5rem;"></i>
+                            </div>
+                            <h4 class="card-title mb-0">Family Package</h4>
+                        </div>
+                        <p class="card-text">Special discount for families of 4 or more.</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="badge bg-success py-2 px-3">Weekends Only</div>
+                            <button class="btn btn-purple" data-bs-toggle="modal" data-bs-target="#familyModal">
+                                More Info
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<!-- Modals for Bank Offers -->
+<!-- Sampath Bank Modal -->
+<div class="modal fade" id="sampathModal" tabindex="-1" aria-labelledby="sampathModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="sampathModalLabel">Sampath Bank Offer</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-3">
+                    <img src="/media/promos/sampath.png" alt="Sampath Bank" style="height: 40px;" class="me-3">
+                    <h4 class="mb-0">25% Off on Weekdays</h4>
+                </div>
+                <p><strong>Valid until:</strong> December 31, 2025</p>
+                <p><strong>Applicable Days:</strong> Monday to Thursday</p>
+                <p><strong>Eligible Cards:</strong> All Sampath Visa Credit and Debit Cards</p>
+                <h5 class="mt-4">Terms & Conditions:</h5>
+                <ul>
+                    <li>Discount applicable only on standard tickets</li>
+                    <li>Maximum discount of Rs. 500 per transaction</li>
+                    <li>Not valid with any other offers</li>
+                    <li>Present your card at the counter for verification</li>
+                    <li>Offer valid at all Scope Cinemas locations</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="https://www.sampath.lk" target="_blank" class="btn btn-primary">Visit Bank Website</a>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- HSBC Modal -->
+<div class="modal fade" id="hsbcModal" tabindex="-1" aria-labelledby="hsbcModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="hsbcModalLabel">HSBC Offer</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-3">
+                    <img src="/media/promos/hsbc.jpg" alt="HSBC" style="height: 40px;" class="me-3">
+                    <h4 class="mb-0">Buy 1 Get 1 Free</h4>
+                </div>
+                <p><strong>Valid until:</strong> October 31, 2025</p>
+                <p><strong>Applicable Days:</strong> Every Friday</p>
+                <p><strong>Eligible Cards:</strong> HSBC Premier and Advance Credit Cards</p>
+                <h5 class="mt-4">Terms & Conditions:</h5>
+                <ul>
+                    <li>Offer valid for 2D screenings only</li>
+                    <li>Free ticket must be of equal or lesser value</li>
+                    <li>Limited to first 100 redemptions per week</li>
+                    <li>Must present card and ID at ticket counter</li>
+                    <li>Not applicable for premium or VIP seats</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="https://www.hsbc.lk" target="_blank" class="btn btn-danger">Visit Bank Website</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- NTB Modal -->
+<div class="modal fade" id="ntbModal" tabindex="-1" aria-labelledby="ntbModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="ntbModalLabel">NTB Offer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-3">
+                    <img src="/media/promos/ntb.png" alt="NTB" style="height: 40px;" class="me-3">
+                    <h4 class="mb-0">Free Popcorn Combo</h4>
+                </div>
+                <p><strong>Valid until:</strong> November 30, 2025</p>
+                <p><strong>Applicable Days:</strong> All days</p>
+                <p><strong>Eligible Cards:</strong> All NTB Debit Cards</p>
+                <h5 class="mt-4">Terms & Conditions:</h5>
+                <ul>
+                    <li>Combo includes medium popcorn and regular soft drink</li>
+                    <li>One combo per ticket purchased</li>
+                    <li>Minimum ticket purchase of Rs. 1000 required</li>
+                    <li>Valid for all movie screenings</li>
+                    <li>Offer cannot be combined with other promotions</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="https://www.nationstrust.com" target="_blank" class="btn btn-warning">Visit Bank Website</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modals for Special Deals -->
+<!-- SLASH Modal -->
+<div class="modal fade" id="slashModal" tabindex="-1" aria-labelledby="slashModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="slashModalLabel">SLASH Partnership</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-3">
+                    <img src="/media/promos/slash.png" alt="SLASH" style="height: 40px;" class="me-3">
+                    <h4 class="mb-0">Scope Cinemas on SLASH!</h4>
+                </div>
+                <p><strong>Discount:</strong> Up to 30% on tickets and combos</p>
+                <p><strong>How to Redeem:</strong></p>
+                <ol>
+                    <li>Download the SLASH app from App Store or Play Store</li>
+                    <li>Search for Scope Cinemas in the Entertainment section</li>
+                    <li>Select your preferred movie and showtime</li>
+                    <li>Apply promo code <strong>SCOPE30</strong> at checkout</li>
+                    <li>Show e-ticket at cinema entrance</li>
+                </ol>
+                <h5 class="mt-4">Benefits:</h5>
+                <ul>
+                    <li>Exclusive early booking window</li>
+                    <li>No convenience fees</li>
+                    <li>Instant cashback on first booking</li>
+                    <li>Special combo deals only on SLASH</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rewards Card Modal -->
+<div class="modal fade" id="rewardsModal" tabindex="-1" aria-labelledby="rewardsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="rewardsModalLabel">Rewards Program</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-3">
+                    <img src="/media/promos/rewards.jpg" alt="Rewards Card" style="height: 40px;" class="me-3">
+                    <h4 class="mb-0">THE REWARDS CARD – OG EDITION</h4>
+                </div>
+                <p><strong>Earn Points:</strong> 10 points per Rs. 1000 spent</p>
+                <p><strong>Redeem Points:</strong></p>
+                <ul>
+                    <li>100 points = Free standard ticket</li>
+                    <li>50 points = Free popcorn</li>
+                    <li>30 points = 20% discount on next purchase</li>
+                </ul>
+                <h5 class="mt-4">Membership Benefits:</h5>
+                <ul>
+                    <li>Priority booking window</li>
+                    <li>Free birthday ticket</li>
+                    <li>Exclusive member screenings</li>
+                    <li>Complimentary seat upgrades</li>
+                </ul>
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    Card available at all Scope Cinemas box offices for Rs. 500 (one-time fee)
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Student Modal -->
+<div class="modal fade" id="studentModal" tabindex="-1" aria-labelledby="studentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title" id="studentModalLabel">Student Offer</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-mortarboard-fill me-3" style="font-size: 2rem;"></i>
+                    <h4 class="mb-0">50% Off for Students</h4>
+                </div>
+                <p><strong>Valid Days:</strong> Monday to Thursday</p>
+                <p><strong>Discount:</strong> 50% off standard ticket price</p>
+                <h5 class="mt-4">Eligibility:</h5>
+                <ul>
+                    <li>Must present valid student ID at ticket counter</li>
+                    <li>Valid for all registered universities and schools</li>
+                    <li>Maximum 2 tickets per student ID</li>
+                </ul>
+                <h5 class="mt-4">Restrictions:</h5>
+                <ul>
+                    <li>Not valid during public holidays</li>
+                    <li>Not applicable for 3D or special screenings</li>
+                    <li>Standard seats only (no premium/VIP)</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Family Modal -->
+<div class="modal fade" id="familyModal" tabindex="-1" aria-labelledby="familyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-purple text-white">
+                <h5 class="modal-title" id="familyModalLabel">Family Package</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="bi bi-people-fill me-3" style="font-size: 2rem;"></i>
+                    <h4 class="mb-0">Family Fun Package</h4>
+                </div>
+                <p><strong>Valid Days:</strong> Saturday and Sunday</p>
+                <p><strong>Package Includes:</strong></p>
+                <ul>
+                    <li>4 tickets for the price of 3</li>
+                    <li>Free upgrade to premium seats</li>
+                    <li>2 large popcorn and 2 large drinks</li>
+                    <li>Kids activity pack (while stocks last)</li>
+                </ul>
+                <h5 class="mt-4">Terms & Conditions:</h5>
+                <ul>
+                    <li>Minimum 1 adult and 1 child required</li>
+                    <li>Valid for family movies (PG or U rated)</li>
+                    <li>Advance booking recommended</li>
+                    <li>Present ID for age verification if needed</li>
+                </ul>
+                <div class="alert alert-warning mt-3">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    Package must be purchased as a bundle at the counter
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dynamic Modals for Promotions -->
+{% for promo in promotions %}
+<div class="modal fade" id="promoModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="promoModalLabel{{ forloop.counter }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="promoModalLabel{{ forloop.counter }}">{{ promo.title }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <img src="{{ promo.image.url }}" class="img-fluid mb-3" alt="{{ promo.title }}">
+                <p>{{ promo.description }}</p>
+                <p><strong>Valid:</strong> {{ promo.start_date|date:"M d, Y" }} to {{ promo.end_date|date:"M d, Y" }}</p>
+                <h5>How to Redeem:</h5>
+                <ol>
+                    <li>Present this offer at the ticket counter</li>
+                    <li>Mention promo code: <strong>{{ promo.code|default:"SCOPE" }}{{ forloop.counter }}</strong></li>
+                    <li>Discount will be applied at checkout</li>
+                </ol>
+                <div class="alert alert-info mt-3">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    {{ promo.terms|default:"Offer cannot be combined with other promotions" }}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success">Save Offer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .bg-purple {
+        background-color: #6f42c1;
+    }
+
+    .btn-purple {
+        background-color: #6f42c1;
+        color: white;
+    }
+
+    .btn-purple:hover {
+        background-color: #5a32a3;
+        color: white;
+    }
+
+    .promo-image-container {
+        height: 180px;
+        overflow: hidden;
+    }
+
+    .promo-image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .card:hover .promo-image-container img {
+        transform: scale(1.05);
+    }
+
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    .modal-header {
+        border-bottom: none;
+    }
+
+    .modal-content {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .modal-body img {
+        border-radius: 5px;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Additional JavaScript for offer tracking can go here
+document.addEventListener('DOMContentLoaded', function() {
+    // Track which offers users view
+    document.querySelectorAll('[data-bs-toggle="modal"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const offerName = this.closest('.card').querySelector('.card-title').textContent;
+            console.log('User viewed offer:', offerName);
+            // You can add analytics tracking here
+        });
+    });
+});
+</script>
 {% endblock %}

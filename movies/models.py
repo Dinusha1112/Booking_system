@@ -115,6 +115,9 @@ class Booking(models.Model):
     def __str__(self):
         return f"Booking #{self.id} for {self.showtime.movie.title}"
 
+    class Meta:
+        ordering = ['-booking_date']
+
 
 class BookedSeat(models.Model):
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE)

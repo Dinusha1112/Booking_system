@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .forms import UserRegisterForm, ContactForm, ProfileEditForm
 from .models import Promotion, UserProfile
-from movies.models import Movie, Theater
+from movies.models import Movie, Theater, Booking
 
 
 def home_view(request):
@@ -48,16 +48,19 @@ def offers_view(request):
 
 @login_required
 def profile_view(request):
-    bookings = Booking.objects.filter(user=request.user).order_by('-booking_date')
     profile = request.user.userprofile
+    bookings = Booking.objects.filter(user=request.user).order_by('-booking_date')
+
+    # 10 points per booking
+    profile.calculate_rewards()
 
     return render(request, 'booking_system/profile.html', {
         'profile': profile,
         'bookings': bookings,
         'bookings_count': bookings.count(),
-        'rewards_points': request.user.userprofile.rewards_points,
-        'rewards_progress': min(100, (request.user.userprofile.rewards_points / 100) * 100),
-        'rewards_needed': max(0, 100 - request.user.userprofile.rewards_points)
+        'rewards_points': profile.rewards_points,
+        'rewards_progress': min(100, (profile.rewards_points % 100)),
+        'rewards_needed': max(0, 100 - (profile.rewards_points % 100))
     })
 
 def register_view(request):

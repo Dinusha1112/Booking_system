@@ -4,49 +4,38 @@ from django.contrib.auth.decorators import login_required
 from .models import Movie, Theater, Showtime, Seat, Booking, BookedSeat
 from .forms import BookingForm
 
+
 def movies_view(request):
     current_date = timezone.now().date()
-    now_showing = Movie.objects.filter(release_date__lte=current_date)
-    coming_soon = Movie.objects.filter(release_date__gt=current_date)
+    movies = Movie.objects.all()
 
-    # Clear filters if requested
-    if 'clear' in request.GET:
-        return redirect('movies:movies')
+    # Apply filters
+    if request.GET.get('q'):
+        movies = movies.filter(title__icontains=request.GET['q'])
 
-    # Search functionality
-    search_query = request.GET.get('q')
-    if search_query:
-        now_showing = now_showing.filter(title__icontains=search_query)
-        coming_soon = coming_soon.filter(title__icontains=search_query)
+    selected_genres = request.GET.getlist('genres')
+    if selected_genres:
+        for genre in selected_genres:
+            movies = movies.filter(genres__name=genre)
+        movies = movies.distinct()
 
-    # Genre filter
-    genre_filter = request.GET.get('genres')
-    if genre_filter:
-        genres = [g.strip() for g in genre_filter.split(',') if g.strip()]
-        if genres:
-            # Filter for movies that have ALL selected genres
-            for genre in genres:
-                now_showing = now_showing.filter(genres__name=genre)
-                coming_soon = coming_soon.filter(genres__name=genre)
+    if request.GET.get('theater'):
+        movies = movies.filter(showtime__theater_id=request.GET['theater']).distinct()
 
-    # Theater filter
-    theater_id = request.GET.get('theater')
-    selected_theater_name = None
-    if theater_id:
-        now_showing = now_showing.filter(showtime__theater_id=theater_id).distinct()
-        try:
-            selected_theater_name = Theater.objects.get(id=theater_id).name
-        except Theater.DoesNotExist:
-            pass
+    # Split into now showing and coming soon
+    now_showing = movies.filter(release_date__lte=current_date)
+    coming_soon = movies.filter(release_date__gt=current_date)
 
-    return render(request, 'movies/movies.html', {
+    context = {
         'now_showing': now_showing,
         'coming_soon': coming_soon,
         'theaters': Theater.objects.all(),
-        'selected_theater': int(theater_id) if theater_id else None,
-        'selected_theater_name': selected_theater_name,
-        'GENRE_CHOICES': Movie.GENRE_CHOICES
-    })
+        'GENRE_CHOICES': Movie.GENRE_CHOICES,
+        'selected_genres': request.GET.getlist('genres'),
+        'selected_theater': request.GET.get('theater'),
+        'search_query': request.GET.get('q', '')
+    }
+    return render(request, 'movies/movies.html', context)
 
 def theaters_view(request):
     theaters = Theater.objects.all()

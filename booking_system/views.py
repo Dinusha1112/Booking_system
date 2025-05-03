@@ -1,12 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.http import JsonResponse
 from .forms import UserRegisterForm, ContactForm, ProfileEditForm
-from .models import Promotion, UserProfile
+from .models import Promotion, UserProfile, Reward, UserReward
 from movies.models import Movie, Theater, Booking
-
+import random
+import string
 
 def home_view(request):
     now_showing = Movie.objects.filter(
@@ -49,18 +51,58 @@ def offers_view(request):
 @login_required
 def profile_view(request):
     profile = request.user.userprofile
-    bookings = Booking.objects.filter(user=request.user).order_by('-booking_date')
+    current_date = timezone.now().date()
 
-    # 10 points per booking
+    # Get all bookings and categorize them
+    all_bookings = Booking.objects.filter(user=request.user).order_by('-booking_date')
+
+    upcoming_bookings = all_bookings.filter(
+        is_cancelled=False,
+        showtime__date__gte=current_date
+    )
+
+    past_bookings = all_bookings.filter(
+        is_cancelled=False,
+        showtime__date__lt=current_date
+    )
+
+    cancelled_bookings = all_bookings.filter(
+        is_cancelled=True
+    )
+
+    # Calculate rewards
     profile.calculate_rewards()
+
+    # Sample rewards
+    rewards = [
+        {'id': 1, 'name': 'Free Small Popcorn', 'description': 'Enjoy a free small popcorn on your next visit',
+         'points_required': 50},
+        {'id': 2, 'name': '10% Off Next Booking', 'description': 'Get 10% discount on your next movie booking',
+         'points_required': 100},
+        {'id': 3, 'name': '25% Off Next Booking', 'description': 'Get 25% discount on your next movie booking',
+         'points_required': 200},
+        {'id': 4, 'name': 'VIP Lounge Access', 'description': 'Exclusive access to VIP lounge for one show',
+         'points_required': 300}
+    ]
+
+    # Get names of claimed rewards
+    claimed_rewards = UserReward.objects.filter(
+        user=request.user,
+        reward_name__in=[r['name'] for r in rewards]
+    ).values_list('reward_name', flat=True)
 
     return render(request, 'booking_system/profile.html', {
         'profile': profile,
-        'bookings': bookings,
-        'bookings_count': bookings.count(),
+        'upcoming_bookings': upcoming_bookings,
+        'past_bookings': past_bookings,
+        'cancelled_bookings': cancelled_bookings,
+        'bookings_count': all_bookings.count(),
         'rewards_points': profile.rewards_points,
         'rewards_progress': min(100, (profile.rewards_points % 100)),
-        'rewards_needed': max(0, 100 - (profile.rewards_points % 100))
+        'rewards_needed': max(0, 100 - (profile.rewards_points % 100)),
+        'rewards': rewards,
+        'claimed_rewards': claimed_rewards,
+        'current_date': current_date,
     })
 
 def register_view(request):
@@ -110,3 +152,77 @@ def profile_edit_view(request):
         'form': form,
         'profile': profile
     })
+
+
+@login_required
+def claim_reward(request, reward_id):
+    profile = request.user.userprofile
+
+    sample_rewards = {
+        1: {'name': 'Free Small Popcorn', 'points_required': 50},
+        2: {'name': '10% Off Next Booking', 'points_required': 100},
+        3: {'name': '25% Off Next Booking', 'points_required': 200},
+        4: {'name': 'VIP Lounge Access', 'points_required': 300}
+    }
+
+    if reward_id not in sample_rewards:
+        messages.error(request, 'Invalid reward')
+        return redirect('profile')
+
+    reward_data = sample_rewards[reward_id]
+
+    if profile.rewards_points >= reward_data['points_required']:
+        # Generate unique code
+        while True:
+            code = 'CINE-' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+            if not UserReward.objects.filter(code=code).exists():
+                break
+
+        UserReward.objects.create(
+            user=request.user,
+            reward_name=reward_data['name'],
+            reward_points=reward_data['points_required'],
+            code=code
+        )
+        profile.rewards_points -= reward_data['points_required']
+        profile.save()
+        messages.success(request, f'Reward claimed! Your code: {code}')
+    else:
+        messages.error(request, 'Not enough points to claim this reward.')
+
+    return redirect('profile')
+
+
+@login_required
+def check_reward_code(request):
+    if request.method == 'POST':
+        code = request.POST.get('code', '').strip()
+        try:
+            reward = UserReward.objects.get(
+                code=code,
+                user=request.user,
+                is_active=True
+            )
+            if reward.is_used:
+                return JsonResponse({'valid': False, 'message': 'This code has already been used'})
+            return JsonResponse({
+                'valid': True,
+                'reward': reward.reward_name,
+                'message': f'Valid code for: {reward.reward_name}'
+            })
+        except UserReward.DoesNotExist:
+            return JsonResponse({'valid': False, 'message': 'Invalid code'})
+
+    return JsonResponse({'valid': False, 'message': 'Invalid request'})
+
+@login_required
+def cancel_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
+    if not booking.is_cancelled and booking.showtime.date >= timezone.now().date():
+        booking.is_cancelled = True
+        booking.cancelled_at = timezone.now()  # Optional: record cancellation time
+        booking.save()
+        messages.success(request, "Booking cancelled successfully")
+    else:
+        messages.error(request, "Cannot cancel this booking")
+    return redirect('profile')

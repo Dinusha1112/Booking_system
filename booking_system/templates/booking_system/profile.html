@@ -69,7 +69,9 @@
                     <p class="small text-muted">
                         {{ rewards_points }} points ({{ rewards_needed }} more for next reward)
                     </p>
-                    <a href="#" class="btn btn-outline-success btn-sm">View Rewards</a>
+                    <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#rewardsModal">
+                        View Rewards
+                    </button>
                 </div>
             </div>
         </div>
@@ -81,90 +83,191 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h3 class="card-title mb-0">My Bookings</h3>
                         <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-outline-secondary active">Upcoming</button>
-                            <button type="button" class="btn btn-outline-secondary">Past</button>
-                            <button type="button" class="btn btn-outline-secondary">Cancelled</button>
+                            <button type="button" class="btn btn-outline-secondary active" onclick="showBookings('upcoming')">Upcoming</button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="showBookings('past')">Past</button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="showBookings('cancelled')">Cancelled</button>
                         </div>
                     </div>
 
-                    {% if bookings %}
-                    <div class="table-responsive">
-                        <table class="table table-hover">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Movie</th>
-                                    <th>Details</th>
-                                    <th>Date</th>
-                                    <th>Status</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for booking in bookings %}
-                                <tr>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="{{ booking.showtime.movie.poster.url }}"
-                                                 class="rounded me-3" width="50" height="75">
-                                            <div>
-                                                <h6 class="mb-0">{{ booking.showtime.movie.title }}</h6>
-                                                <small class="text-muted">{{ booking.seats.count }} seat(s)</small>
+                    <!-- Upcoming Bookings -->
+                    <div id="upcoming-bookings">
+                        {% if upcoming_bookings %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Movie</th>
+                                        <th>Details</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for booking in upcoming_bookings %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="{% if booking.showtime.movie.poster %}{{ booking.showtime.movie.poster.url }}{% else %}/media/images/movie_icon.jpg{% endif %}"
+                                                     class="rounded me-3" width="50" height="75" alt="{{ booking.showtime.movie.title }} poster">
+                                                <div>
+                                                    <h6 class="mb-0">{{ booking.showtime.movie.title }}</h6>
+                                                    <small class="text-muted">{{ booking.seats.count }} seat(s)</small>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <small class="d-block">{{ booking.showtime.theater.name }}</small>
-                                        <small class="text-muted">
-                                            {{ booking.showtime.time|time:"g:i A" }} •
-                                            {% for booked_seat in booking.bookedseat_set.all %}
-                                                {{ booked_seat.seat.row }}{{ booked_seat.seat.seat_number }}{% if not forloop.last %}, {% endif %}
-                                            {% endfor %}
-                                        </small>
-                                    </td>
-                                    <td>{{ booking.showtime.date|date:"M d, Y" }}</td>
-                                    <td>
-                                        <span class="badge bg-{% if booking.is_cancelled %}danger{% else %}success{% endif %}">
-                                            {% if booking.is_cancelled %}Cancelled{% else %}Confirmed{% endif %}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                                                    type="button"
-                                                    data-bs-toggle="dropdown">
-                                                Options
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="#">
-                                                    <i class="bi bi-ticket-detailed me-2"></i>View Ticket
-                                                </a></li>
-                                                <li><a class="dropdown-item" href="#">
-                                                    <i class="bi bi-printer me-2"></i>Print Ticket
-                                                </a></li>
-                                                {% if not booking.is_cancelled %}
-                                                <li><hr class="dropdown-divider"></li>
-                                                <li><a class="dropdown-item text-danger" href="#">
-                                                    <i class="bi bi-x-circle me-2"></i>Cancel Booking
-                                                </a></li>
-                                                {% endif %}
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                        </td>
+                                        <td>
+                                            <small class="d-block">{{ booking.showtime.theater.name }}</small>
+                                            <small class="text-muted">
+                                                {{ booking.showtime.time|time:"g:i A" }} •
+                                                {% for booked_seat in booking.bookedseat_set.all %}
+                                                    {{ booked_seat.seat.row }}{{ booked_seat.seat.seat_number }}{% if not forloop.last %}, {% endif %}
+                                                {% endfor %}
+                                            </small>
+                                        </td>
+                                        <td>{{ booking.showtime.date|date:"M d, Y" }}</td>
+                                        <td>
+                                            <span class="badge bg-success">Confirmed</span>
+                                        </td>
+                                        <td>
+                                            <form method="post" action="{% url 'cancel_booking' booking.id %}" class="d-inline">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                        onclick="return confirm('Are you sure you want to cancel this booking?')">
+                                                    <i class="bi bi-x-circle me-1"></i>Cancel
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <img src="/media/images/movie_icon.jpg" width="200" class="mb-4">
+                            <h5>No upcoming bookings</h5>
+                            <p class="text-muted">Your upcoming movie bookings will appear here</p>
+                            <a href="{% url 'movies:movies' %}" class="btn btn-primary">
+                                <i class="bi bi-ticket-perforated me-2"></i>Book a Movie
+                            </a>
+                        </div>
+                        {% endif %}
                     </div>
-                    {% else %}
-                    <div class="text-center py-5">
-                        <img src="{% static 'images/no-bookings.svg' %}" width="200" class="mb-4">
-                        <h5>No bookings yet</h5>
-                        <p class="text-muted">Your upcoming movie bookings will appear here</p>
-                        <a href="{% url 'movies:movies' %}" class="btn btn-primary">
-                            <i class="bi bi-ticket-perforated me-2"></i>Book a Movie
-                        </a>
+
+                    <!-- Past Bookings (hidden by default) -->
+                    <div id="past-bookings" style="display: none;">
+                        {% if past_bookings %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Movie</th>
+                                        <th>Details</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for booking in past_bookings %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="{% if booking.showtime.movie.poster %}{{ booking.showtime.movie.poster.url }}{% else %}/media/images/movie_icon.jpg{% endif %}"
+                                                     class="rounded me-3" width="50" height="75" alt="{{ booking.showtime.movie.title }} poster">
+                                                <div>
+                                                    <h6 class="mb-0">{{ booking.showtime.movie.title }}</h6>
+                                                    <small class="text-muted">{{ booking.seats.count }} seat(s)</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <small class="d-block">{{ booking.showtime.theater.name }}</small>
+                                            <small class="text-muted">
+                                                {{ booking.showtime.time|time:"g:i A" }} •
+                                                {% for booked_seat in booking.bookedseat_set.all %}
+                                                    {{ booked_seat.seat.row }}{{ booked_seat.seat.seat_number }}{% if not forloop.last %}, {% endif %}
+                                                {% endfor %}
+                                            </small>
+                                        </td>
+                                        <td>{{ booking.showtime.date|date:"M d, Y" }}</td>
+                                        <td>
+                                            <span class="badge bg-warning">Completed</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted small">N/A</span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <img src="/media/images/movie_icon.jpg" width="200" class="mb-4">
+                            <h5>No past bookings</h5>
+                            <p class="text-muted">Your completed movie bookings will appear here</p>
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
+
+                    <!-- Cancelled Bookings (hidden by default) -->
+                    <div id="cancelled-bookings" style="display: none;">
+                        {% if cancelled_bookings %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Movie</th>
+                                        <th>Details</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for booking in cancelled_bookings %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="{% if booking.showtime.movie.poster %}{{ booking.showtime.movie.poster.url }}{% else %}/media/images/movie_icon.jpg{% endif %}"
+                                                     class="rounded me-3" width="50" height="75" alt="{{ booking.showtime.movie.title }} poster">
+                                                <div>
+                                                    <h6 class="mb-0">{{ booking.showtime.movie.title }}</h6>
+                                                    <small class="text-muted">{{ booking.seats.count }} seat(s)</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <small class="d-block">{{ booking.showtime.theater.name }}</small>
+                                            <small class="text-muted">
+                                                {{ booking.showtime.time|time:"g:i A" }} •
+                                                {% for booked_seat in booking.bookedseat_set.all %}
+                                                    {{ booked_seat.seat.row }}{{ booked_seat.seat.seat_number }}{% if not forloop.last %}, {% endif %}
+                                                {% endfor %}
+                                            </small>
+                                        </td>
+                                        <td>{{ booking.showtime.date|date:"M d, Y" }}</td>
+                                        <td>
+                                            <span class="badge bg-danger">Cancelled</span>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted small">N/A</span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5">
+                            <img src="/media/images/movie_icon.jpg" width="200" class="mb-4">
+                            <h5>No cancelled bookings</h5>
+                            <p class="text-muted">Your cancelled movie bookings will appear here</p>
+                        </div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
@@ -229,4 +332,73 @@
         transform: scale(1.05);
     }
 </style>
+
+<!-- Rewards Modal -->
+<div class="modal fade" id="rewardsModal" tabindex="-1" aria-labelledby="rewardsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rewardsModalLabel">Available Rewards For This Month</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="list-group">
+                    {% for reward in rewards %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">{{ reward.name }}</h6>
+                            <small class="text-muted">{{ reward.description }}</small>
+                            <div class="mt-2">
+                                <span class="badge bg-secondary">
+                                    {{ reward.points_required }} points needed
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            {% if profile.rewards_points >= reward.points_required %}
+                                {% if reward.name in claimed_rewards %}
+                                    <span class="text-success">Claimed</span>
+                                {% else %}
+                                    <a href="{% url 'claim_reward' reward.id %}" class="btn btn-sm btn-success">Claim</a>
+                                {% endif %}
+                            {% else %}
+                                <button class="btn btn-sm btn-outline-secondary" disabled>Not enough points</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="list-group-item">
+                        <p class="text-muted mb-0">No rewards available at this time</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function showBookings(type) {
+    // Hide all booking sections
+    document.getElementById('upcoming-bookings').style.display = 'none';
+    document.getElementById('past-bookings').style.display = 'none';
+    document.getElementById('cancelled-bookings').style.display = 'none';
+
+    // Show the selected section
+    document.getElementById(type + '-bookings').style.display = 'block';
+
+    // Update active button state
+    const buttons = document.querySelectorAll('.btn-group .btn');
+    buttons.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent.toLowerCase().includes(type)) {
+            btn.classList.add('active');
+        }
+    });
+}
+</script>
+
 {% endblock %}

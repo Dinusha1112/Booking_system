@@ -58,8 +58,9 @@ class UserReward(models.Model):
     reward_name = models.CharField(max_length=100, default='Default Reward')
     reward_points = models.PositiveIntegerField(default=0)
     claimed_at = models.DateTimeField(auto_now_add=True)
-    code = models.CharField(max_length=15, default='CODE-0000')
+    code = models.CharField(max_length=15, unique=True)
     is_used = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         unique_together = ('user', 'reward_name')  # Prevent duplicate claims

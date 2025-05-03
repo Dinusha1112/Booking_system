@@ -131,7 +131,6 @@ def profile_edit_view(request):
 def claim_reward(request, reward_id):
     profile = request.user.userprofile
 
-    # Sample rewards data
     sample_rewards = {
         1: {'name': 'Free Small Popcorn', 'points_required': 50},
         2: {'name': '10% Off Next Booking', 'points_required': 100},
@@ -146,24 +145,45 @@ def claim_reward(request, reward_id):
     reward_data = sample_rewards[reward_id]
 
     if profile.rewards_points >= reward_data['points_required']:
-        if not UserReward.objects.filter(user=request.user, reward_name=reward_data['name']).exists():
-            # Generate random code
+        # Generate unique code
+        while True:
             code = 'CINE-' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+            if not UserReward.objects.filter(code=code).exists():
+                break
 
-            # Create UserReward without requiring a Reward object
-            UserReward.objects.create(
-                user=request.user,
-                reward_name=reward_data['name'],
-                reward_points=reward_data['points_required'],
-                code=code
-            )
-            # Deduct points
-            profile.rewards_points -= reward_data['points_required']
-            profile.save()
-            messages.success(request, f'Reward claimed! Your code: {code}')
-        else:
-            messages.warning(request, 'You have already claimed this reward.')
+        UserReward.objects.create(
+            user=request.user,
+            reward_name=reward_data['name'],
+            reward_points=reward_data['points_required'],
+            code=code
+        )
+        profile.rewards_points -= reward_data['points_required']
+        profile.save()
+        messages.success(request, f'Reward claimed! Your code: {code}')
     else:
         messages.error(request, 'Not enough points to claim this reward.')
 
     return redirect('profile')
+
+
+@login_required
+def check_reward_code(request):
+    if request.method == 'POST':
+        code = request.POST.get('code', '').strip()
+        try:
+            reward = UserReward.objects.get(
+                code=code,
+                user=request.user,
+                is_active=True
+            )
+            if reward.is_used:
+                return JsonResponse({'valid': False, 'message': 'This code has already been used'})
+            return JsonResponse({
+                'valid': True,
+                'reward': reward.reward_name,
+                'message': f'Valid code for: {reward.reward_name}'
+            })
+        except UserReward.DoesNotExist:
+            return JsonResponse({'valid': False, 'message': 'Invalid code'})
+
+    return JsonResponse({'valid': False, 'message': 'Invalid request'})

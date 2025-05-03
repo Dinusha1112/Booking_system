@@ -3,8 +3,8 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from .forms import UserRegisterForm, ContactForm
-from .models import Promotion
+from .forms import UserRegisterForm, ContactForm, ProfileEditForm
+from .models import Promotion, UserProfile
 from movies.models import Movie, Theater
 
 
@@ -80,3 +80,22 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('home')
+
+
+@login_required
+def profile_edit_view(request):
+    profile = request.user.userprofile
+
+    if request.method == 'POST':
+        form = ProfileEditForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your profile has been updated!')
+            return redirect('profile')
+    else:
+        form = ProfileEditForm(instance=profile)
+
+    return render(request, 'booking_system/profile_edit.html', {
+        'form': form,
+        'profile': profile
+    })

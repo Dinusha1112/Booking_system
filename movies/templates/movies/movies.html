@@ -123,7 +123,11 @@
                         </div>
                         <div class="card-footer bg-white">
                             {% if first_showtime %}
-                                <span class="btn btn-danger w-100">Book Now</span>
+                                {% if user.is_authenticated %}
+                                    <a href="{% url 'movies:booking' first_showtime.id %}" class="btn btn-danger w-100">Book Now</a>
+                                {% else %}
+                                    <a href="{% url 'login' %}?next={% url 'movies:booking' first_showtime.id %}" class="btn btn-danger w-100">Book Now</a>
+                                {% endif %}
                             {% else %}
                                 <span class="btn btn-secondary w-100" disabled>No Showtimes</span>
                             {% endif %}

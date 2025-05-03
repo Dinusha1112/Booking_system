@@ -87,6 +87,12 @@ body {
     color: white;
     border-color: #dc3545;
     cursor: not-allowed;
+    opacity: 1;
+}
+
+.seat-booked {
+    background-color: #dc3545;
+    border: 1px solid #dc3545;
 }
 
 .screen {
@@ -148,4 +154,16 @@ body {
     font-weight: 500;
     padding: 8px 16px;
     transition: all 0.2s;
+}
+
+.filter-section {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+.filter-badge {
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    margin-right: 8px;
 }

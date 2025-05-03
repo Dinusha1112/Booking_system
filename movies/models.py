@@ -70,6 +70,10 @@ class Showtime(models.Model):
 
 
 class Seat(models.Model):
+
+    def __str__(self):
+        return f"{self.row}{self.seat_number}"
+
     screen = models.ForeignKey('Screen', on_delete=models.CASCADE)
     seat_number = models.CharField(max_length=10)
     row = models.CharField(max_length=2)
@@ -107,9 +111,14 @@ class Booking(models.Model):
     total_price = models.DecimalField(max_digits=8, decimal_places=2)
     booking_date = models.DateTimeField(auto_now_add=True)
     payment_status = models.BooleanField(default=False)
+    is_cancelled = models.BooleanField(default=False)
+    cancelled_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"Booking #{self.id} for {self.showtime.movie.title}"
+
+    class Meta:
+        ordering = ['-booking_date']
 
 
 class BookedSeat(models.Model):

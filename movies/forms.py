@@ -13,6 +13,5 @@ class BookingForm(forms.ModelForm):
             screen = showtime.theater.screen_set.first()
             if screen:
                 self.fields['seats'].queryset = Seat.objects.filter(
-                    screen=screen,
-                    is_booked=False
-                )
+                    screen=screen
+                ).order_by('row', 'seat_number')

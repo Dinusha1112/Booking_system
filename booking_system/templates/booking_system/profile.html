@@ -88,7 +88,6 @@
                             <button type="button" class="btn btn-outline-secondary">Cancelled</button>
                         </div>
                     </div>
-
                     {% if bookings %}
                     <div class="table-responsive">
                         <table class="table table-hover">
@@ -125,32 +124,25 @@
                                     </td>
                                     <td>{{ booking.showtime.date|date:"M d, Y" }}</td>
                                     <td>
-                                        <span class="badge bg-{% if booking.is_cancelled %}danger{% else %}success{% endif %}">
-                                            {% if booking.is_cancelled %}Cancelled{% else %}Confirmed{% endif %}
+                                        <span class="badge bg-{% if booking.is_cancelled %}danger{% elif booking.showtime.date < current_date %}warning{% else %}success{% endif %}">
+                                            {% if booking.is_cancelled %}Cancelled
+                                            {% elif booking.showtime.date < current_date %}Completed
+                                            {% else %}Confirmed
+                                            {% endif %}
                                         </span>
                                     </td>
                                     <td>
-                                        <div class="dropdown">
-                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                                                    type="button"
-                                                    data-bs-toggle="dropdown">
-                                                Options
+                                        {% if not booking.is_cancelled and booking.showtime.date >= current_date %}
+                                        <form method="post" action="{% url 'cancel_booking' booking.id %}" class="d-inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                    onclick="return confirm('Are you sure you want to cancel this booking?')">
+                                                <i class="bi bi-x-circle me-1"></i>Cancel
                                             </button>
-                                            <ul class="dropdown-menu">
-                                                <li><a class="dropdown-item" href="#">
-                                                    <i class="bi bi-ticket-detailed me-2"></i>View Ticket
-                                                </a></li>
-                                                <li><a class="dropdown-item" href="#">
-                                                    <i class="bi bi-printer me-2"></i>Print Ticket
-                                                </a></li>
-                                                {% if not booking.is_cancelled %}
-                                                <li><hr class="dropdown-divider"></li>
-                                                <li><a class="dropdown-item text-danger" href="#">
-                                                    <i class="bi bi-x-circle me-2"></i>Cancel Booking
-                                                </a></li>
-                                                {% endif %}
-                                            </ul>
-                                        </div>
+                                        </form>
+                                        {% else %}
+                                        <span class="text-muted small">N/A</span>
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -237,7 +229,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="rewardsModalLabel">Available Rewards</h5>
+                <h5 class="modal-title" id="rewardsModalLabel">Available Rewards For This Month</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">

@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.http import JsonResponse
 from .forms import UserRegisterForm, ContactForm, ProfileEditForm
 from .models import Promotion, UserProfile, Reward, UserReward
 from movies.models import Movie, Theater, Booking
@@ -57,7 +58,7 @@ def profile_view(request):
     rewards = [
         {'id': 1, 'name': 'Free Small Popcorn', 'description': 'Enjoy a free small popcorn on your next visit', 'points_required': 50},
         {'id': 2, 'name': '10% Off Next Booking', 'description': 'Get 10% discount on your next movie booking', 'points_required': 100},
-        {'id': 3, 'name': 'Free Movie Ticket', 'description': 'Redeem for one free standard movie ticket', 'points_required': 200},
+        {'id': 3, 'name': '25% Off Next Booking', 'description': 'Get 25% discount on your next movie booking', 'points_required': 200},
         {'id': 4, 'name': 'VIP Lounge Access', 'description': 'Exclusive access to VIP lounge for one show', 'points_required': 300}
     ]
 
@@ -75,7 +76,8 @@ def profile_view(request):
         'rewards_progress': min(100, (profile.rewards_points % 100)),
         'rewards_needed': max(0, 100 - (profile.rewards_points % 100)),
         'rewards': rewards,
-        'claimed_rewards': claimed_rewards
+        'claimed_rewards': claimed_rewards,
+        'current_date': timezone.now().date(),
     })
 
 def register_view(request):
@@ -134,7 +136,7 @@ def claim_reward(request, reward_id):
     sample_rewards = {
         1: {'name': 'Free Small Popcorn', 'points_required': 50},
         2: {'name': '10% Off Next Booking', 'points_required': 100},
-        3: {'name': 'Free Movie Ticket', 'points_required': 200},
+        3: {'name': '25% Off Next Booking', 'points_required': 200},
         4: {'name': 'VIP Lounge Access', 'points_required': 300}
     }
 
@@ -187,3 +189,14 @@ def check_reward_code(request):
             return JsonResponse({'valid': False, 'message': 'Invalid code'})
 
     return JsonResponse({'valid': False, 'message': 'Invalid request'})
+
+@login_required
+def cancel_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
+    if not booking.is_cancelled and booking.showtime.date >= timezone.now().date():
+        booking.is_cancelled = True
+        booking.save()
+        messages.success(request, "Booking cancelled successfully")
+    else:
+        messages.error(request, "Cannot cancel this booking")
+    return redirect('profile')

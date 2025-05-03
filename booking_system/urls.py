@@ -11,5 +11,6 @@ urlpatterns = [
     path('contact/', views.contact_view, name='contact'),
     path('offers/', views.offers_view, name='offers'),
     path('claim-reward/<int:reward_id>/', views.claim_reward, name='claim_reward'),
-path('check-reward-code/', views.check_reward_code, name='check_reward_code'),
+    path('check-reward-code/', views.check_reward_code, name='check_reward_code'),
+    path('cancel-booking/<int:booking_id>/', views.cancel_booking, name='cancel_booking'),
 ]

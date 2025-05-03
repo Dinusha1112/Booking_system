@@ -4,45 +4,229 @@
 {% block content %}
 <div class="container my-5">
     <div class="row">
-        <div class="col-md-4">
-            <div class="card shadow">
+        <!-- Profile Card -->
+        <div class="col-lg-4 mb-4">
+            <div class="card profile-card shadow-lg">
+                <div class="card-body text-center p-4">
+                    <div class="profile-pic-container mb-3">
+                        <img src="{% if profile.profile_pic %}{{ profile.profile_pic.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}"
+                             class="profile-pic rounded-circle border border-4 border-primary">
+                        <div class="upload-overlay">
+                            <a href="{% url 'profile_edit' %}" class="text-white">
+                                <i class="bi bi-camera-fill"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <h3 class="mb-2">{{ user.get_full_name|default:user.username }}</h3>
+                    <p class="text-muted mb-3">
+                        <i class="bi bi-award-fill"></i> Member since {{ user.date_joined|date:"M Y" }}
+                    </p>
+
+                    <div class="profile-stats d-flex justify-content-around mb-4">
+                        <div>
+                            <h5 class="mb-0">{{ bookings_count }}</h5>
+                            <small class="text-muted">Bookings</small>
+                        </div>
+                        <div>
+                            <h5 class="mb-0">{{ rewards_points }}</h5>
+                            <small class="text-muted">Reward Points</small>
+                        </div>
+                    </div>
+
+                    <div class="profile-info text-start">
+                        <p class="mb-2">
+                            <i class="bi bi-envelope-fill text-primary me-2"></i>
+                            {{ user.email }}
+                        </p>
+                        <p class="mb-2">
+                            <i class="bi bi-telephone-fill text-primary me-2"></i>
+                            {{ profile.phone_number|default:"Not provided" }}
+                        </p>
+                        <p class="mb-3">
+                            <i class="bi bi-geo-alt-fill text-primary me-2"></i>
+                            {{ profile.address|default:"No address provided" }}
+                        </p>
+                    </div>
+
+                    <a href="{% url 'profile_edit' %}" class="btn btn-primary w-100 mt-2">
+                        <i class="bi bi-pencil-square me-2"></i>Edit Profile
+                    </a>
+                </div>
+            </div>
+
+            <!-- Rewards Card -->
+            <div class="card shadow-sm mt-4 rewards-card">
                 <div class="card-body text-center">
-                    <img src="{% static 'images/default-profile.png' %}" class="rounded-circle mb-3" width="150" height="150">
-                    <h3>{{ user.username }}</h3>
-                    <p class="text-muted">{{ user.email }}</p>
-                    <hr>
-                    <p><i class="bi bi-telephone-fill me-2"></i> {{ profile.phone_number }}</p>
-                    <p><i class="bi bi-house-fill me-2"></i> {{ profile.address|default:"No address provided" }}</p>
-                    <a href="#" class="btn btn-outline-primary w-100 mt-3">Edit Profile</a>
+                    <h5 class="card-title">Your Rewards</h5>
+                    <div class="progress mb-3">
+                        <div class="progress-bar bg-success" role="progressbar"
+                             style="width: {{ rewards_progress }}%"
+                             aria-valuenow="{{ rewards_progress }}"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+                    <p class="small text-muted">
+                        {{ rewards_points }} points ({{ rewards_needed }} more for next reward)
+                    </p>
+                    <a href="#" class="btn btn-outline-success btn-sm">View Rewards</a>
                 </div>
             </div>
         </div>
-        <div class="col-md-8">
-            <div class="card shadow">
+
+        <!-- Bookings Section -->
+        <div class="col-lg-8">
+            <div class="card shadow-lg">
                 <div class="card-body">
-                    <h3 class="card-title mb-4">My Bookings</h3>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="card-title mb-0">My Bookings</h3>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-secondary active">Upcoming</button>
+                            <button type="button" class="btn btn-outline-secondary">Past</button>
+                            <button type="button" class="btn btn-outline-secondary">Cancelled</button>
+                        </div>
+                    </div>
+
+                    {% if bookings %}
                     <div class="table-responsive">
-                        <table class="table">
-                            <thead>
+                        <table class="table table-hover">
+                            <thead class="table-light">
                                 <tr>
                                     <th>Movie</th>
-                                    <th>Theater</th>
-                                    <th>Date & Time</th>
-                                    <th>Seats</th>
+                                    <th>Details</th>
+                                    <th>Date</th>
                                     <th>Status</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                {% for booking in bookings %}
                                 <tr>
-                                    <td colspan="6" class="text-center">No bookings found</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ booking.showtime.movie.poster.url }}"
+                                                 class="rounded me-3" width="50" height="75">
+                                            <div>
+                                                <h6 class="mb-0">{{ booking.showtime.movie.title }}</h6>
+                                                <small class="text-muted">{{ booking.seats.count }} seat(s)</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <small class="d-block">{{ booking.showtime.theater.name }}</small>
+                                        <small class="text-muted">
+                                            {{ booking.showtime.time|time:"g:i A" }} •
+                                            {% for booked_seat in booking.bookedseat_set.all %}
+                                                {{ booked_seat.seat.row }}{{ booked_seat.seat.seat_number }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </small>
+                                    </td>
+                                    <td>{{ booking.showtime.date|date:"M d, Y" }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if booking.is_cancelled %}danger{% else %}success{% endif %}">
+                                            {% if booking.is_cancelled %}Cancelled{% else %}Confirmed{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                                                    type="button"
+                                                    data-bs-toggle="dropdown">
+                                                Options
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li><a class="dropdown-item" href="#">
+                                                    <i class="bi bi-ticket-detailed me-2"></i>View Ticket
+                                                </a></li>
+                                                <li><a class="dropdown-item" href="#">
+                                                    <i class="bi bi-printer me-2"></i>Print Ticket
+                                                </a></li>
+                                                {% if not booking.is_cancelled %}
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item text-danger" href="#">
+                                                    <i class="bi bi-x-circle me-2"></i>Cancel Booking
+                                                </a></li>
+                                                {% endif %}
+                                            </ul>
+                                        </div>
+                                    </td>
                                 </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <img src="{% static 'images/no-bookings.svg' %}" width="200" class="mb-4">
+                        <h5>No bookings yet</h5>
+                        <p class="text-muted">Your upcoming movie bookings will appear here</p>
+                        <a href="{% url 'movies:movies' %}" class="btn btn-primary">
+                            <i class="bi bi-ticket-perforated me-2"></i>Book a Movie
+                        </a>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .profile-card {
+        border-radius: 15px;
+        overflow: hidden;
+        border: none;
+    }
+
+    .profile-pic-container {
+        position: relative;
+        width: fit-content;
+        margin: 0 auto;
+    }
+
+    .profile-pic {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+    }
+
+    .upload-overlay {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background: rgba(13, 110, 253, 0.8);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .upload-overlay:hover {
+        background: rgba(13, 110, 253, 1);
+        transform: scale(1.1);
+    }
+
+    .rewards-card {
+        border-radius: 15px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border: none;
+    }
+
+    .progress {
+        height: 8px;
+        border-radius: 4px;
+    }
+
+    .table img {
+        transition: transform 0.2s;
+    }
+
+    .table img:hover {
+        transform: scale(1.05);
+    }
+</style>
 {% endblock %}

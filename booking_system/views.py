@@ -3,9 +3,9 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
-from .forms import UserRegisterForm, ContactForm
-from .models import Promotion
-from movies.models import Movie, Theater
+from .forms import UserRegisterForm, ContactForm, ProfileEditForm
+from .models import Promotion, UserProfile
+from movies.models import Movie, Theater, Booking
 
 
 def home_view(request):
@@ -48,9 +48,20 @@ def offers_view(request):
 
 @login_required
 def profile_view(request):
-    user_profile = request.user.userprofile
-    return render(request, 'booking_system/profile.html', {'profile': user_profile})
+    profile = request.user.userprofile
+    bookings = Booking.objects.filter(user=request.user).order_by('-booking_date')
 
+    # 10 points per booking
+    profile.calculate_rewards()
+
+    return render(request, 'booking_system/profile.html', {
+        'profile': profile,
+        'bookings': bookings,
+        'bookings_count': bookings.count(),
+        'rewards_points': profile.rewards_points,
+        'rewards_progress': min(100, (profile.rewards_points % 100)),
+        'rewards_needed': max(0, 100 - (profile.rewards_points % 100))
+    })
 
 def register_view(request):
     if request.method == 'POST':
@@ -80,3 +91,22 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('home')
+
+
+@login_required
+def profile_edit_view(request):
+    profile = request.user.userprofile
+
+    if request.method == 'POST':
+        form = ProfileEditForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Your profile has been updated!')
+            return redirect('profile')
+    else:
+        form = ProfileEditForm(instance=profile)
+
+    return render(request, 'booking_system/profile_edit.html', {
+        'form': form,
+        'profile': profile
+    })

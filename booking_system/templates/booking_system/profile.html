@@ -108,8 +108,8 @@
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <img src="{{ booking.showtime.movie.poster.url }}"
-                                                     class="rounded me-3" width="50" height="75">
+                                                <img src="{% if booking.showtime.movie.poster %}{{ booking.showtime.movie.poster.url }}{% else %}/media/images/movie_icon.jpg{% endif %}"
+                                                     class="rounded me-3" width="50" height="75" alt="{{ booking.showtime.movie.title }} poster">
                                                 <div>
                                                     <h6 class="mb-0">{{ booking.showtime.movie.title }}</h6>
                                                     <small class="text-muted">{{ booking.seats.count }} seat(s)</small>
@@ -145,7 +145,7 @@
                         </div>
                         {% else %}
                         <div class="text-center py-5">
-                            <img src="{% static 'images/no-bookings.svg' %}" width="200" class="mb-4">
+                            <img src="/media/images/movie_icon.jpg" width="200" class="mb-4">
                             <h5>No upcoming bookings</h5>
                             <p class="text-muted">Your upcoming movie bookings will appear here</p>
                             <a href="{% url 'movies:movies' %}" class="btn btn-primary">
@@ -174,8 +174,8 @@
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <img src="{{ booking.showtime.movie.poster.url }}"
-                                                     class="rounded me-3" width="50" height="75">
+                                                <img src="{% if booking.showtime.movie.poster %}{{ booking.showtime.movie.poster.url }}{% else %}/media/images/movie_icon.jpg{% endif %}"
+                                                     class="rounded me-3" width="50" height="75" alt="{{ booking.showtime.movie.title }} poster">
                                                 <div>
                                                     <h6 class="mb-0">{{ booking.showtime.movie.title }}</h6>
                                                     <small class="text-muted">{{ booking.seats.count }} seat(s)</small>
@@ -205,7 +205,7 @@
                         </div>
                         {% else %}
                         <div class="text-center py-5">
-                            <img src="{% static 'images/no-bookings.svg' %}" width="200" class="mb-4">
+                            <img src="/media/images/movie_icon.jpg" width="200" class="mb-4">
                             <h5>No past bookings</h5>
                             <p class="text-muted">Your completed movie bookings will appear here</p>
                         </div>
@@ -231,8 +231,8 @@
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <img src="{{ booking.showtime.movie.poster.url }}"
-                                                     class="rounded me-3" width="50" height="75">
+                                                <img src="{% if booking.showtime.movie.poster %}{{ booking.showtime.movie.poster.url }}{% else %}/media/images/movie_icon.jpg{% endif %}"
+                                                     class="rounded me-3" width="50" height="75" alt="{{ booking.showtime.movie.title }} poster">
                                                 <div>
                                                     <h6 class="mb-0">{{ booking.showtime.movie.title }}</h6>
                                                     <small class="text-muted">{{ booking.seats.count }} seat(s)</small>
@@ -262,7 +262,7 @@
                         </div>
                         {% else %}
                         <div class="text-center py-5">
-                            <img src="{% static 'images/no-bookings.svg' %}" width="200" class="mb-4">
+                            <img src="/media/images/movie_icon.jpg" width="200" class="mb-4">
                             <h5>No cancelled bookings</h5>
                             <p class="text-muted">Your cancelled movie bookings will appear here</p>
                         </div>

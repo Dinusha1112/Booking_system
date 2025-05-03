@@ -4,9 +4,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .forms import UserRegisterForm, ContactForm, ProfileEditForm
-from .models import Promotion, UserProfile
+from .models import Promotion, UserProfile, Reward, UserReward
 from movies.models import Movie, Theater, Booking
-
+import random
+import string
 
 def home_view(request):
     now_showing = Movie.objects.filter(
@@ -50,9 +51,21 @@ def offers_view(request):
 def profile_view(request):
     profile = request.user.userprofile
     bookings = Booking.objects.filter(user=request.user).order_by('-booking_date')
-
-    # 10 points per booking
     profile.calculate_rewards()
+
+    # Sample rewards
+    rewards = [
+        {'id': 1, 'name': 'Free Small Popcorn', 'description': 'Enjoy a free small popcorn on your next visit', 'points_required': 50},
+        {'id': 2, 'name': '10% Off Next Booking', 'description': 'Get 10% discount on your next movie booking', 'points_required': 100},
+        {'id': 3, 'name': 'Free Movie Ticket', 'description': 'Redeem for one free standard movie ticket', 'points_required': 200},
+        {'id': 4, 'name': 'VIP Lounge Access', 'description': 'Exclusive access to VIP lounge for one show', 'points_required': 300}
+    ]
+
+    # Get names of claimed rewards
+    claimed_rewards = UserReward.objects.filter(
+        user=request.user,
+        reward_name__in=[r['name'] for r in rewards]
+    ).values_list('reward_name', flat=True)
 
     return render(request, 'booking_system/profile.html', {
         'profile': profile,
@@ -60,7 +73,9 @@ def profile_view(request):
         'bookings_count': bookings.count(),
         'rewards_points': profile.rewards_points,
         'rewards_progress': min(100, (profile.rewards_points % 100)),
-        'rewards_needed': max(0, 100 - (profile.rewards_points % 100))
+        'rewards_needed': max(0, 100 - (profile.rewards_points % 100)),
+        'rewards': rewards,
+        'claimed_rewards': claimed_rewards
     })
 
 def register_view(request):
@@ -110,3 +125,45 @@ def profile_edit_view(request):
         'form': form,
         'profile': profile
     })
+
+
+@login_required
+def claim_reward(request, reward_id):
+    profile = request.user.userprofile
+
+    # Sample rewards data
+    sample_rewards = {
+        1: {'name': 'Free Small Popcorn', 'points_required': 50},
+        2: {'name': '10% Off Next Booking', 'points_required': 100},
+        3: {'name': 'Free Movie Ticket', 'points_required': 200},
+        4: {'name': 'VIP Lounge Access', 'points_required': 300}
+    }
+
+    if reward_id not in sample_rewards:
+        messages.error(request, 'Invalid reward')
+        return redirect('profile')
+
+    reward_data = sample_rewards[reward_id]
+
+    if profile.rewards_points >= reward_data['points_required']:
+        if not UserReward.objects.filter(user=request.user, reward_name=reward_data['name']).exists():
+            # Generate random code
+            code = 'CINE-' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+
+            # Create UserReward without requiring a Reward object
+            UserReward.objects.create(
+                user=request.user,
+                reward_name=reward_data['name'],
+                reward_points=reward_data['points_required'],
+                code=code
+            )
+            # Deduct points
+            profile.rewards_points -= reward_data['points_required']
+            profile.save()
+            messages.success(request, f'Reward claimed! Your code: {code}')
+        else:
+            messages.warning(request, 'You have already claimed this reward.')
+    else:
+        messages.error(request, 'Not enough points to claim this reward.')
+
+    return redirect('profile')

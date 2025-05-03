@@ -10,4 +10,5 @@ urlpatterns = [
     path('profile/edit/', views.profile_edit_view, name='profile_edit'),  # Add this line
     path('contact/', views.contact_view, name='contact'),
     path('offers/', views.offers_view, name='offers'),
+    path('claim-reward/<int:reward_id>/', views.claim_reward, name='claim_reward'),
 ]

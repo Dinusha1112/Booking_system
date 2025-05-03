@@ -69,7 +69,9 @@
                     <p class="small text-muted">
                         {{ rewards_points }} points ({{ rewards_needed }} more for next reward)
                     </p>
-                    <a href="#" class="btn btn-outline-success btn-sm">View Rewards</a>
+                    <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#rewardsModal">
+                        View Rewards
+                    </button>
                 </div>
             </div>
         </div>
@@ -229,4 +231,52 @@
         transform: scale(1.05);
     }
 </style>
+
+<!-- Rewards Modal -->
+<div class="modal fade" id="rewardsModal" tabindex="-1" aria-labelledby="rewardsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rewardsModalLabel">Available Rewards</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="list-group">
+                    {% for reward in rewards %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">{{ reward.name }}</h6>
+                            <small class="text-muted">{{ reward.description }}</small>
+                            <div class="mt-2">
+                                <span class="badge bg-secondary">
+                                    {{ reward.points_required }} points needed
+                                </span>
+                            </div>
+                        </div>
+                        <div>
+                            {% if profile.rewards_points >= reward.points_required %}
+                                {% if reward.name in claimed_rewards %}
+                                    <span class="text-success">Claimed</span>
+                                {% else %}
+                                    <a href="{% url 'claim_reward' reward.id %}" class="btn btn-sm btn-success">Claim</a>
+                                {% endif %}
+                            {% else %}
+                                <button class="btn btn-sm btn-outline-secondary" disabled>Not enough points</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="list-group-item">
+                        <p class="text-muted mb-0">No rewards available at this time</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
@@ -43,3 +42,27 @@ class Promotion(models.Model):
 
     def __str__(self):
         return self.title
+
+class Reward(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    points_required = models.PositiveIntegerField()
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
+
+class UserReward(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    reward = models.ForeignKey(Reward, on_delete=models.CASCADE, null=True, blank=True)
+    reward_name = models.CharField(max_length=100, default='Default Reward')
+    reward_points = models.PositiveIntegerField(default=0)
+    claimed_at = models.DateTimeField(auto_now_add=True)
+    code = models.CharField(max_length=15, default='CODE-0000')
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        unique_together = ('user', 'reward_name')  # Prevent duplicate claims
+
+    def __str__(self):
+        return f"{self.user.username}'s {self.reward_name}"

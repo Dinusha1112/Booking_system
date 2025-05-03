@@ -13,8 +13,11 @@ def movies_view(request):
     if request.GET.get('q'):
         movies = movies.filter(title__icontains=request.GET['q'])
 
-    if request.GET.getlist('genres'):
-        movies = movies.filter(genres__name__in=request.GET.getlist('genres')).distinct()
+    selected_genres = request.GET.getlist('genres')
+    if selected_genres:
+        for genre in selected_genres:
+            movies = movies.filter(genres__name=genre)
+        movies = movies.distinct()
 
     if request.GET.get('theater'):
         movies = movies.filter(showtime__theater_id=request.GET['theater']).distinct()

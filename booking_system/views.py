@@ -51,15 +51,38 @@ def offers_view(request):
 @login_required
 def profile_view(request):
     profile = request.user.userprofile
-    bookings = Booking.objects.filter(user=request.user).order_by('-booking_date')
+    current_date = timezone.now().date()
+
+    # Get all bookings and categorize them
+    all_bookings = Booking.objects.filter(user=request.user).order_by('-booking_date')
+
+    upcoming_bookings = all_bookings.filter(
+        is_cancelled=False,
+        showtime__date__gte=current_date
+    )
+
+    past_bookings = all_bookings.filter(
+        is_cancelled=False,
+        showtime__date__lt=current_date
+    )
+
+    cancelled_bookings = all_bookings.filter(
+        is_cancelled=True
+    )
+
+    # Calculate rewards
     profile.calculate_rewards()
 
     # Sample rewards
     rewards = [
-        {'id': 1, 'name': 'Free Small Popcorn', 'description': 'Enjoy a free small popcorn on your next visit', 'points_required': 50},
-        {'id': 2, 'name': '10% Off Next Booking', 'description': 'Get 10% discount on your next movie booking', 'points_required': 100},
-        {'id': 3, 'name': '25% Off Next Booking', 'description': 'Get 25% discount on your next movie booking', 'points_required': 200},
-        {'id': 4, 'name': 'VIP Lounge Access', 'description': 'Exclusive access to VIP lounge for one show', 'points_required': 300}
+        {'id': 1, 'name': 'Free Small Popcorn', 'description': 'Enjoy a free small popcorn on your next visit',
+         'points_required': 50},
+        {'id': 2, 'name': '10% Off Next Booking', 'description': 'Get 10% discount on your next movie booking',
+         'points_required': 100},
+        {'id': 3, 'name': '25% Off Next Booking', 'description': 'Get 25% discount on your next movie booking',
+         'points_required': 200},
+        {'id': 4, 'name': 'VIP Lounge Access', 'description': 'Exclusive access to VIP lounge for one show',
+         'points_required': 300}
     ]
 
     # Get names of claimed rewards
@@ -70,14 +93,16 @@ def profile_view(request):
 
     return render(request, 'booking_system/profile.html', {
         'profile': profile,
-        'bookings': bookings,
-        'bookings_count': bookings.count(),
+        'upcoming_bookings': upcoming_bookings,
+        'past_bookings': past_bookings,
+        'cancelled_bookings': cancelled_bookings,
+        'bookings_count': all_bookings.count(),
         'rewards_points': profile.rewards_points,
         'rewards_progress': min(100, (profile.rewards_points % 100)),
         'rewards_needed': max(0, 100 - (profile.rewards_points % 100)),
         'rewards': rewards,
         'claimed_rewards': claimed_rewards,
-        'current_date': timezone.now().date(),
+        'current_date': current_date,
     })
 
 def register_view(request):
@@ -195,6 +220,7 @@ def cancel_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id, user=request.user)
     if not booking.is_cancelled and booking.showtime.date >= timezone.now().date():
         booking.is_cancelled = True
+        booking.cancelled_at = timezone.now()  # Optional: record cancellation time
         booking.save()
         messages.success(request, "Booking cancelled successfully")
     else:

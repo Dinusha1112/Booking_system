@@ -5,23 +5,27 @@
 <div class="container my-5">
     <h1 class="text-center mb-5">Our Theaters</h1>
     
-    <div class="row g-4">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
         {% for theater in theaters %}
-        <div class="col-md-6 col-lg-4">
+        <div class="col">
             <div class="card h-100 shadow">
-                <img src="{{ theater.image.url }}" class="card-img-top" alt="{{ theater.name }}">
-                <div class="card-body">
+                <div class="ratio ratio-16x9">
+                    <img src="{{ theater.image.url }}" class="card-img-top object-fit-cover" alt="{{ theater.name }}">
+                </div>
+                <div class="card-body d-flex flex-column">
                     <h3 class="card-title">{{ theater.name }}</h3>
-                    <p class="text-muted">
+                    <p class="text-muted mb-2">
                         <i class="bi bi-geo-alt-fill"></i> {{ theater.location }}
                     </p>
-                    <p><i class="bi bi-telephone-fill"></i> {{ theater.contact }}</p>
-                    
-                    <div class="d-grid gap-2 mt-4">
+                    <p class="mb-3"><i class="bi bi-telephone-fill"></i> {{ theater.contact }}</p>
+
+                    <div class="mt-auto d-grid gap-2">
                         <a href="{% url 'movies:movies' %}?theater={{ theater.id }}" class="btn btn-danger">
                             View Movies
                         </a>
-                        <a href="#" class="btn btn-outline-secondary">
+                        <a href="https://www.google.com/maps/search/?api=1&query={{ theater.name|urlencode }}+{{ theater.location|urlencode }}"
+                           target="_blank"
+                           class="btn btn-outline-secondary">
                             <i class="bi bi-map"></i> Get Directions
                         </a>
                     </div>
@@ -31,4 +35,16 @@
         {% endfor %}
     </div>
 </div>
+
+<style>
+    .object-fit-cover {
+        object-fit: cover;
+    }
+    .card {
+        transition: transform 0.2s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+    }
+</style>
 {% endblock %}

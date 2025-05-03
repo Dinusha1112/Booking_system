@@ -48,9 +48,17 @@ def offers_view(request):
 
 @login_required
 def profile_view(request):
-    user_profile = request.user.userprofile
-    return render(request, 'booking_system/profile.html', {'profile': user_profile})
+    bookings = Booking.objects.filter(user=request.user).order_by('-booking_date')
+    profile = request.user.userprofile
 
+    return render(request, 'booking_system/profile.html', {
+        'profile': profile,
+        'bookings': bookings,
+        'bookings_count': bookings.count(),
+        'rewards_points': request.user.userprofile.rewards_points,
+        'rewards_progress': min(100, (request.user.userprofile.rewards_points / 100) * 100),
+        'rewards_needed': max(0, 100 - request.user.userprofile.rewards_points)
+    })
 
 def register_view(request):
     if request.method == 'POST':

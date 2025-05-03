@@ -41,20 +41,20 @@
                                     {% regroup form.seats.field.queryset|dictsort:"row" by row as seat_rows %}
                                     {% for row in seat_rows reversed %}
                                     <div class="seat-row d-flex justify-content-center flex-wrap gap-1 mb-1">
-                                        {% for seat in row.list|dictsortreversed:"seat_number" %}
-                                        <div class="seat-container" data-seat-id="{{ seat.id }}">
-                                            <input class="seat-checkbox" type="checkbox"
-                                                   name="seats" value="{{ seat.id }}"
-                                                   id="seat-{{ seat.id }}"
-                                                   {% if seat.is_booked %}disabled{% endif %}>
-                                            <label class="seat-label {% if seat.is_booked %}booked{% endif %}"
-                                                   for="seat-{{ seat.id }}"
-                                                   data-seat-number="{{ row.grouper }}{{ seat.seat_number }}"
-                                                   data-seat-price="{{ showtime.price }}">
-                                                {{ row.grouper }}{{ seat.seat_number }}
-                                            </label>
-                                        </div>
-                                        {% endfor %}
+                                    {% for seat in row.list|dictsortreversed:"seat_number" %}
+                                    <div class="seat-container" data-seat-id="{{ seat.id }}">
+                                        <input class="seat-checkbox" type="checkbox"
+                                               name="seats" value="{{ seat.id }}"
+                                               id="seat-{{ seat.id }}"
+                                               {% if seat.is_booked %}disabled{% endif %}>
+                                        <label class="seat-label {% if seat.is_booked %}booked{% endif %}"
+                                               for="seat-{{ seat.id }}"
+                                               data-seat-number="{{ row.grouper }}{{ seat.seat_number }}"
+                                               data-seat-price="{{ showtime.price }}">
+                                            {{ row.grouper }}{{ seat.seat_number }}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
                                     </div>
                                     {% endfor %}
                                 </div>

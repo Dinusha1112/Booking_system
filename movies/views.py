@@ -62,6 +62,7 @@ def booking_view(request, showtime_id):
     if request.method == 'POST':
         form = BookingForm(request.POST, showtime=showtime)
         if form.is_valid():
+            # Create booking
             booking = Booking(
                 user=request.user,
                 showtime=showtime,
@@ -70,6 +71,7 @@ def booking_view(request, showtime_id):
             )
             booking.save()
 
+            # Book the seats
             for seat in form.cleaned_data['seats']:
                 seat.is_booked = True
                 seat.save()

@@ -83,4 +83,29 @@
         cursor: pointer;
     }
 </style>
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the file input and image elements
+    const fileInput = document.getElementById('id_profile_pic');
+    const profilePic = document.querySelector('.profile-pic');
+
+    // Listen for changes to the file input
+    fileInput.addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                // Update the image source with the new photo
+                profilePic.src = event.target.result;
+            }
+
+            // Read the selected file as a data URL
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+});
+</script>
+{% endblock %}
 {% endblock %}

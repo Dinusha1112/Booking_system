@@ -70,6 +70,10 @@ class Showtime(models.Model):
 
 
 class Seat(models.Model):
+
+    def __str__(self):
+        return f"{self.row}{self.seat_number}"
+
     screen = models.ForeignKey('Screen', on_delete=models.CASCADE)
     seat_number = models.CharField(max_length=10)
     row = models.CharField(max_length=2)

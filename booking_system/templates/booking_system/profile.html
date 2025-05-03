@@ -116,7 +116,9 @@
                                         <small class="d-block">{{ booking.showtime.theater.name }}</small>
                                         <small class="text-muted">
                                             {{ booking.showtime.time|time:"g:i A" }} •
-                                            {{ booking.seats.all|join:", " }}
+                                            {% for booked_seat in booking.bookedseat_set.all %}
+                                                {{ booked_seat.seat.row }}{{ booked_seat.seat.seat_number }}{% if not forloop.last %}, {% endif %}
+                                            {% endfor %}
                                         </small>
                                     </td>
                                     <td>{{ booking.showtime.date|date:"M d, Y" }}</td>

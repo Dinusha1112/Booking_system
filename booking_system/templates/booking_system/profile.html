@@ -4,79 +4,82 @@
 {% block content %}
 <div class="container my-5">
     <div class="row">
-        <!-- Profile Card -->
-        <div class="col-lg-4 mb-4">
-            <div class="card profile-card shadow-lg">
-                <div class="card-body text-center p-4">
-                    <div class="profile-pic-container mb-3">
-                        <img src="{% if profile.profile_pic %}{{ profile.profile_pic.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}"
-                             class="profile-pic rounded-circle border border-4 border-primary">
-                        <div class="upload-overlay">
-                            <a href="{% url 'profile_edit' %}" class="text-white">
-                                <i class="bi bi-camera-fill"></i>
-                            </a>
+        <!-- Left Column (Profile + Rewards) -->
+        <div class="col-lg-4">
+            <div class="d-flex flex-column">
+                <!-- Profile Card -->
+                <div class="card profile-card shadow-lg mb-4">
+                    <div class="card-body text-center p-4">
+                        <div class="profile-pic-container mb-3">
+                            <img src="{% if profile.profile_pic %}{{ profile.profile_pic.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}"
+                                 class="profile-pic rounded-circle border border-4 border-primary">
+                            <div class="upload-overlay">
+                                <a href="{% url 'profile_edit' %}" class="text-white">
+                                    <i class="bi bi-camera-fill"></i>
+                                </a>
+                            </div>
                         </div>
-                    </div>
-                    <h3 class="mb-2">{{ user.get_full_name|default:user.username }}</h3>
-                    <p class="text-muted mb-3">
-                        <i class="bi bi-award-fill"></i> Member since {{ user.date_joined|date:"M Y" }}
-                    </p>
+                        <h3 class="mb-2">{{ user.get_full_name|default:user.username }}</h3>
+                        <p class="text-muted mb-3">
+                            <i class="bi bi-award-fill"></i> Member since {{ user.date_joined|date:"M Y" }}
+                        </p>
 
-                    <div class="profile-stats d-flex justify-content-around mb-4">
-                        <div>
-                            <h5 class="mb-0">{{ bookings_count }}</h5>
-                            <small class="text-muted">Bookings</small>
+                        <div class="profile-stats d-flex justify-content-around mb-4">
+                            <div>
+                                <h5 class="mb-0">{{ bookings_count }}</h5>
+                                <small class="text-muted">Bookings</small>
+                            </div>
+                            <div>
+                                <h5 class="mb-0">{{ rewards_points }}</h5>
+                                <small class="text-muted">Reward Points</small>
+                            </div>
                         </div>
-                        <div>
-                            <h5 class="mb-0">{{ rewards_points }}</h5>
-                            <small class="text-muted">Reward Points</small>
+
+                        <div class="profile-info text-start">
+                            <p class="mb-2">
+                                <i class="bi bi-envelope-fill text-primary me-2"></i>
+                                {{ user.email }}
+                            </p>
+                            <p class="mb-2">
+                                <i class="bi bi-telephone-fill text-primary me-2"></i>
+                                {{ profile.phone_number|default:"Not provided" }}
+                            </p>
+                            <p class="mb-3">
+                                <i class="bi bi-geo-alt-fill text-primary me-2"></i>
+                                {{ profile.address|default:"No address provided" }}
+                            </p>
                         </div>
-                    </div>
 
-                    <div class="profile-info text-start">
-                        <p class="mb-2">
-                            <i class="bi bi-envelope-fill text-primary me-2"></i>
-                            {{ user.email }}
-                        </p>
-                        <p class="mb-2">
-                            <i class="bi bi-telephone-fill text-primary me-2"></i>
-                            {{ profile.phone_number|default:"Not provided" }}
-                        </p>
-                        <p class="mb-3">
-                            <i class="bi bi-geo-alt-fill text-primary me-2"></i>
-                            {{ profile.address|default:"No address provided" }}
-                        </p>
+                        <a href="{% url 'profile_edit' %}" class="btn btn-primary w-100 mt-2">
+                            <i class="bi bi-pencil-square me-2"></i>Edit Profile
+                        </a>
                     </div>
-
-                    <a href="{% url 'profile_edit' %}" class="btn btn-primary w-100 mt-2">
-                        <i class="bi bi-pencil-square me-2"></i>Edit Profile
-                    </a>
                 </div>
-            </div>
 
-            <!-- Rewards Card -->
-            <div class="card shadow-sm mt-4 rewards-card">
-                <div class="card-body text-center">
-                    <h5 class="card-title">Your Rewards</h5>
-                    <div class="progress mb-3">
-                        <div class="progress-bar bg-success" role="progressbar"
-                             style="width: {{ rewards_progress }}%"
-                             aria-valuenow="{{ rewards_progress }}"
-                             aria-valuemin="0"
-                             aria-valuemax="100">
+                <!-- Rewards Card -->
+                <div class="card shadow-sm rewards-card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Your Rewards</h5>
+                        <div class="progress mb-3">
+                            <div class="progress-bar bg-success" role="progressbar"
+                                 style="width: {{ rewards_progress }}%"
+                                 aria-valuenow="{{ rewards_progress }}"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100">
+                            </div>
                         </div>
+                        <p class="small text-muted">
+                            {{ rewards_points }} )
+                        </p>
+                        <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#rewardsModal">
+                            View Rewards
+                        </button>
                     </div>
-                    <p class="small text-muted">
-                        {{ rewards_points }} points ({{ rewards_needed }} more for next reward)
-                    </p>
-                    <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#rewardsModal">
-                        View Rewards
-                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Bookings Section -->
+        <!-- Right Column (Bookings) -->
         <div class="col-lg-8">
             <div class="card shadow-lg">
                 <div class="card-body">

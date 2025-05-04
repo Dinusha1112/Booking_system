@@ -6,7 +6,7 @@
 <div class="container my-5">
     <!-- Search and Filter Section -->
     <section class="mb-4">
-        <form method="get" action="{% url 'movies:movies' %}" class="row g-3">
+        <form method="get" action="{% url 'movies:movies' %}" class="row g-3 align-items-end">
             <!-- Search Input -->
             <div class="col-md-4">
                 <input type="text" class="form-control" name="q" placeholder="Search movies..."
@@ -15,18 +15,18 @@
 
             <!-- Genre Dropdown -->
             <div class="col-md-3">
-            <select class="form-select" name="genres" multiple id="genre-select">
-                {% for code, name in GENRE_CHOICES %}
-                    <option value="{{ name }}"
-                            {% if name in selected_genres %}selected{% endif %}>
-                        {{ name }}
-                    </option>
-                {% endfor %}
-            </select>
+                <select class="form-select" name="genres" multiple id="genre-select">
+                    {% for code, name in GENRE_CHOICES %}
+                        <option value="{{ name }}"
+                                {% if name in selected_genres %}selected{% endif %}>
+                            {{ name }}
+                        </option>
+                    {% endfor %}
+                </select>
             </div>
 
             <!-- Theater Dropdown -->
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <select class="form-select" name="theater">
                     <option value="">All Theaters</option>
                     {% for theater in theaters %}
@@ -37,12 +37,10 @@
                 </select>
             </div>
 
-            <!-- Submit and Clear Buttons -->
-            <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">Filter</button>
-            </div>
-            <div class="col-md-2">
-                <a href="{% url 'movies:movies' %}" class="btn btn-outline-danger w-100" onclick="resetFilters()">Clear</a>
+            <!-- Filter and Clear Buttons in one column -->
+            <div class="col-md-3 d-flex">
+                <button type="submit" class="btn btn-primary me-2 flex-grow-1">Filter</button>
+                <a href="{% url 'movies:movies' %}" class="btn btn-outline-danger flex-grow-1" onclick="resetFilters()">Clear</a>
             </div>
         </form>
 
@@ -74,7 +72,7 @@
             </span>
             {% endif %}
         </div>
-    {% endif %}
+        {% endif %}
     </section>
 
     <!-- Now Showing Section -->
@@ -91,7 +89,7 @@
         <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
             {% for movie in now_showing %}
             <div class="col">
-                {% with movie.showtime_set.first as first_showtime %}
+                {% with movie.current_showtimes.0 as first_showtime %}
                 <a href="{% if first_showtime %}{% url 'movies:booking' first_showtime.id %}{% else %}#{% endif %}" class="text-decoration-none">
                     <div class="card h-100 shadow">
                         <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 400px; object-fit: cover;">
@@ -125,32 +123,41 @@
 
     <!-- Coming Soon Section -->
     <section id="coming-soon" class="mt-5 pt-5">
-        <h2 class="mb-4">Coming Soon</h2>
-        {% if not coming_soon %}
-        <div class="alert alert-info">
-            No upcoming movies announced yet.
-        </div>
-        {% else %}
-        <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-            {% for movie in coming_soon %}
-            <div class="col">
-                <a href="{% url 'movies:movies' %}?movie={{ movie.id }}" class="text-decoration-none">
-                    <div class="card h-100 shadow">
-                        <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 400px; object-fit: cover;">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ movie.title }}</h5>
-                            <div class="mb-2">
-                                <span class="badge bg-secondary me-1">{{ movie.get_genre_display }}</span>
-                                <span class="text-muted">Coming {{ movie.release_date|date:"M d, Y" }}</span>
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold">Coming Soon</h2>
+            </div>
+
+            {% if not coming_soon %}
+            <div class="alert alert-info">
+                No upcoming movies announced yet.
+            </div>
+            {% else %}
+            <div class="swiper coming-soon-swiper">
+                <div class="swiper-wrapper">
+                    {% for movie in coming_soon %}
+                    <div class="swiper-slide">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="movie-poster-container">
+                                <img src="{{ movie.poster.url }}" class="card-img-top movie-poster" alt="{{ movie.title }}" style="height: 300px; object-fit: cover;">
                             </div>
-                            <span class="btn btn-outline-secondary w-100 mt-2">Notify Me</span>
+                            <div class="card-body">
+                                <h5 class="card-title">{{ movie.title }}</h5>
+                                <div class="mb-2">
+                                    <span class="badge bg-secondary me-1">{{ movie.get_genre_display }}</span>
+                                </div>
+                                <p class="text-muted">Releases on {{ movie.release_date|date:"M d, Y" }}</p>
+                            </div>
                         </div>
                     </div>
-                </a>
+                    {% endfor %}
+                </div>
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-button-prev"></div>
             </div>
-            {% endfor %}
+            {% endif %}
         </div>
-        {% endif %}
     </section>
 </div>
 {% endblock %}
@@ -204,6 +211,39 @@ function resetFilters() {
     $('#genre-select').val(null).trigger('change');
     // Other filter clearing logic
 }
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Coming Soon Swiper
+    const comingSoonSwiper = new Swiper('.coming-soon-swiper', {
+        slidesPerView: 1,
+        spaceBetween: 20,
+        loop: false,
+        autoplay: {
+            delay: 3500,
+            disableOnInteraction: false,
+        },
+        pagination: {
+            el: '.coming-soon-swiper .swiper-pagination',
+            clickable: true,
+        },
+        navigation: {
+            nextEl: '.coming-soon-swiper .swiper-button-next',
+            prevEl: '.coming-soon-swiper .swiper-button-prev',
+        },
+        breakpoints: {
+            576: { slidesPerView: 2 },
+            992: { slidesPerView: 3 },
+            1200: { slidesPerView: 4 }
+        }
+    });
+
+    // Disable autoplay if we have fewer than 4 movies
+    if (document.querySelectorAll('.coming-soon-swiper .swiper-slide:not(.swiper-slide-duplicate)').length < 4) {
+        comingSoonSwiper.autoplay.stop();
+    }
+});
 </script>
 
 <style>

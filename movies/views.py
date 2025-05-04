@@ -66,18 +66,16 @@ def theaters_view(request):
         'theaters': theaters
     })
 
-
 @login_required
 def booking_view(request, showtime_id):
     showtime = get_object_or_404(Showtime, id=showtime_id)
 
-    # Get theaters where this movie is being shown
+    # Get theaters, dates and times (unchanged)
     movie_theaters = Theater.objects.filter(
         showtime__movie=showtime.movie,
         showtime__date__gte=timezone.now().date()
     ).distinct()
 
-    # Rest remains exactly the same
     available_dates = Showtime.objects.filter(
         movie=showtime.movie
     ).dates('date', 'day').distinct()
@@ -87,25 +85,41 @@ def booking_view(request, showtime_id):
         date=showtime.date
     ).order_by('time').values_list('time', flat=True).distinct()
 
+    # Get all booked seat IDs for this showtime
+    booked_seat_ids = BookedSeat.objects.filter(
+        booking__showtime=showtime,
+        booking__is_cancelled=False
+    ).values_list('seat_id', flat=True)
+
     if request.method == 'POST':
         form = BookingForm(request.POST, showtime=showtime)
         if form.is_valid():
-            # Create booking
-            booking = Booking(
-                user=request.user,
-                showtime=showtime,
-                total_price=showtime.price * len(form.cleaned_data['seats']),
-                payment_status=True
-            )
-            booking.save()
+            selected_seats = form.cleaned_data['seats']
 
-            # Book the seats
-            for seat in form.cleaned_data['seats']:
-                seat.is_booked = True
-                seat.save()
-                BookedSeat.objects.create(booking=booking, seat=seat)
+            # Validate no selected seats are already booked
+            conflict_seats = [seat for seat in selected_seats if seat.id in booked_seat_ids]
+            if conflict_seats:
+                messages.error(request, f"Seat(s) {', '.join(str(seat) for seat in conflict_seats)} are already booked")
+            else:
+                # Create booking
+                booking = Booking(
+                    user=request.user,
+                    showtime=showtime,
+                    total_price=showtime.price * len(selected_seats),
+                    payment_status=True
+                )
+                booking.save()
 
-            return redirect('movies:booking_confirmation', booking_id=booking.id)
+                # Create BookedSeat records
+                for seat in selected_seats:
+                    BookedSeat.objects.create(booking=booking, seat=seat)
+
+                # Update rewards
+                profile = request.user.userprofile
+                profile.rewards_points += 10
+                profile.save()
+
+                return redirect('movies:booking_confirmation', booking_id=booking.id)
     else:
         form = BookingForm(showtime=showtime)
 
@@ -114,7 +128,8 @@ def booking_view(request, showtime_id):
         'movie_theaters': movie_theaters,
         'available_dates': available_dates,
         'available_times': available_times,
-        'form': form
+        'form': form,
+        'booked_seat_ids': list(booked_seat_ids)  # Convert to list for template
     })
 
 @login_required

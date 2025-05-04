@@ -215,12 +215,23 @@ def check_reward_code(request):
 
     return JsonResponse({'valid': False, 'message': 'Invalid request'})
 
+
 @login_required
 def cancel_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id, user=request.user)
     if not booking.is_cancelled and booking.showtime.date >= timezone.now().date():
+        # Mark seats as available again
+        for booked_seat in booking.bookedseat_set.all():
+            booked_seat.seat.is_booked = False
+            booked_seat.seat.save()
+
+        # Deduct rewards points (10 points per booking)
+        profile = request.user.userprofile
+        profile.rewards_points = max(0, profile.rewards_points - 10)  # Ensure points don't go negative
+        profile.save()
+
         booking.is_cancelled = True
-        booking.cancelled_at = timezone.now()  # Optional: record cancellation time
+        booking.cancelled_at = timezone.now()
         booking.save()
         messages.success(request, "Booking cancelled successfully")
     else:

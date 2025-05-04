@@ -71,6 +71,22 @@ def theaters_view(request):
 def booking_view(request, showtime_id):
     showtime = get_object_or_404(Showtime, id=showtime_id)
 
+    # Get theaters where this movie is being shown
+    movie_theaters = Theater.objects.filter(
+        showtime__movie=showtime.movie,
+        showtime__date__gte=timezone.now().date()
+    ).distinct()
+
+    # Rest remains exactly the same
+    available_dates = Showtime.objects.filter(
+        movie=showtime.movie
+    ).dates('date', 'day').distinct()
+
+    available_times = Showtime.objects.filter(
+        movie=showtime.movie,
+        date=showtime.date
+    ).order_by('time').values_list('time', flat=True).distinct()
+
     if request.method == 'POST':
         form = BookingForm(request.POST, showtime=showtime)
         if form.is_valid():
@@ -95,6 +111,9 @@ def booking_view(request, showtime_id):
 
     return render(request, 'movies/booking.html', {
         'showtime': showtime,
+        'movie_theaters': movie_theaters,
+        'available_dates': available_dates,
+        'available_times': available_times,
         'form': form
     })
 

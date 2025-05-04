@@ -92,7 +92,7 @@
                 {% with movie.current_showtimes.0 as first_showtime %}
                 <a href="{% if first_showtime %}{% url 'movies:booking' first_showtime.id %}{% else %}#{% endif %}" class="text-decoration-none">
                     <div class="card h-100 shadow">
-                        <img src="{{ movie.poster.url }}" class="card-img-top" alt="{{ movie.title }}" style="height: 400px; object-fit: cover;">
+                        <img src="{{ movie.poster.url }}" class="card-img-top movie-poster-fixed-height" alt="{{ movie.title }}">
                         <div class="card-body">
                             <h5 class="card-title">{{ movie.title }}</h5>
                             <div class="mb-2">

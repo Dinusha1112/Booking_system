@@ -11,11 +11,19 @@ body {
     overflow: hidden;
     border: none;
     margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card-footer {
+    margin-top: auto; /* Pushes footer to bottom */
+    padding: 1rem; /* Ensures consistent padding */
 }
 
 /* Movie Cards */
@@ -26,6 +34,11 @@ body {
     align-items: center;
     justify-content: center;
     background-color: #f0f0f0;
+}
+
+.movie-poster-fixed-height {
+    height: 400px;
+    object-fit: cover;
 }
 
 .movie-poster {

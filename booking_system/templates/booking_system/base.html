@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    <header class="bg-dark text-white sticky-top">
+    <header class="bg-dark text-white">
         <div class="container">
             <nav class="navbar navbar-expand-lg navbar-dark">
                 <div class="container-fluid px-0">
@@ -129,4 +129,15 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     {% block extra_js %}{% endblock %}
 </body>
+
+<style>
+    header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: white; /* Ensures header is opaque */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Optional: adds shadow for better visibility */
+}
+</style>
+
 </html>

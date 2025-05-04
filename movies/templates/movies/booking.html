@@ -8,20 +8,45 @@
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body">
                     <h2 class="card-title fw-bold mb-4">Booking for {{ showtime.movie.title }}</h2>
-
                     <div class="mb-4 p-3 bg-light rounded">
-                        <div class="row">
-                            <div class="col-md-4 mb-2 mb-md-0">
-                                <strong>Theater:</strong> {{ showtime.theater.name }}
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label"><strong>Theater:</strong></label>
+                                <select class="form-select" id="theater-select">
+                                    {% for theater in movie_theaters %}
+                                        <option value="{{ theater.id }}"
+                                                {% if theater.id == showtime.theater.id %}selected{% endif %}>
+                                            {{ theater.name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
                             </div>
-                            <div class="col-md-3 mb-2 mb-md-0">
-                                <strong>Date:</strong> {{ showtime.date }}
+                            <div class="col-md-3">
+                                <label class="form-label"><strong>Date:</strong></label>
+                                <select class="form-select" id="date-select">
+                                    {% for date in available_dates %}
+                                        <option value="{{ date }}"
+                                                {% if date == showtime.date %}selected{% endif %}>
+                                            {{ date }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
                             </div>
-                            <div class="col-md-3 mb-2 mb-md-0">
-                                <strong>Time:</strong> {{ showtime.time|time:"g:i A" }}
+                            <div class="col-md-3">
+                                <label class="form-label"><strong>Time:</strong></label>
+                                <select class="form-select" id="time-select">
+                                    {% for time in available_times %}
+                                        <option value="{{ time }}"
+                                                {% if time == showtime.time %}selected{% endif %}>
+                                            {{ time|time:"g:i A" }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
                             </div>
-                            <div class="col-md-2">
-                                <strong>Price:</strong> Rs. {{ showtime.price }}
+                            <div class="col-md-2 d-flex align-items-end">
+                                <div>
+                                    <strong>Price:</strong> Rs. {{ showtime.price }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -244,12 +269,34 @@
             gap: 3px;
         }
     }
+
+    .form-select {
+        cursor: pointer;
+    }
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+
+        // Add change event listeners for the dropdowns
+    document.getElementById('theater-select').addEventListener('change', function() {
+
+        // Handle theater change
+        console.log('Theater changed to:', this.value);
+    });
+
+    document.getElementById('date-select').addEventListener('change', function() {
+        // Handle date change
+        console.log('Date changed to:', this.value);
+    });
+
+    document.getElementById('time-select').addEventListener('change', function() {
+        // Handle time change
+        console.log('Time changed to:', this.value);
+    });
+
     const seatCheckboxes = document.querySelectorAll('.seat-checkbox');
     const selectedSeatsList = document.getElementById('selected-seats-list');
     const subtotalPrice = document.getElementById('subtotal-price');

@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 from django.utils import timezone
 from movies.models import Movie, Theater, Showtime, Screen, Seat, Genre
 from datetime import timedelta
-
+import random
 
 class Command(BaseCommand):
     help = 'Populates the database with movies, theaters, screens and seats'
@@ -364,44 +364,123 @@ class Command(BaseCommand):
             }
         ]
 
-        # Create movies with multiple genres
+        # MOVIE DATA AND SCHEDULING STRATEGY
         today = timezone.now().date()
         all_theaters = list(Theater.objects.all())
 
+        # Explicitly select 6 coming soon movies
+        coming_soon_movies = random.sample(movies_data, 6)
+        remaining_movies = [m for m in movies_data if m not in coming_soon_movies]
+
+        # Select 5 past movies
+        past_movies = random.sample(remaining_movies, 5)
+        remaining_movies = [m for m in remaining_movies if m not in past_movies]
+
+        # Select 4 mid-May ending movies
+        mid_may_movies = random.sample(remaining_movies, 4)
+        remaining_movies = [m for m in remaining_movies if m not in mid_may_movies]
+
+        # The rest will be normal current movies ending after May 14th
+        normal_movies = remaining_movies
+
+        theater_movie_map = {t.id: [] for t in all_theaters}
+
         for movie_data in movies_data:
+            coming_soon = movie_data in coming_soon_movies
+            past = movie_data in past_movies
+            mid_may = movie_data in mid_may_movies
+
+            # Set release dates
+            if coming_soon:
+                release_date = today + timedelta(days=30)
+                end_date = None
+            elif past:
+                release_date = today - timedelta(days=30)
+                end_date = today - timedelta(days=random.randint(3, 20))
+            elif mid_may:
+                release_date = today - timedelta(days=7)
+                end_date = today + timedelta(days=random.randint(1, 5))  # Between May 5-9
+            else:  # normal movies
+                release_date = today - timedelta(days=7)
+                end_date = today + timedelta(days=random.randint(15, 30))  # After May 14
+
             movie, created = Movie.objects.update_or_create(
                 title=movie_data['title'],
                 defaults={
                     'description': movie_data['description'],
                     'duration': movie_data['duration'],
                     'language': movie_data.get('language', 'EN'),
-                    'release_date': today - timedelta(days=7) if not movie_data.get(
-                        'coming_soon') else today + timedelta(days=30),
+                    'release_date': release_date,
                     'poster': movie_data['poster'],
-                    'rating': movie_data.get('rating', 8.0)
+                    'rating': movie_data.get('rating', 0.0)
                 }
             )
-
-            # Clear existing genres and add new ones
             movie.genres.clear()
             for genre_code in movie_data['genres']:
                 genre = Genre.objects.get(code=genre_code)
                 movie.genres.add(genre)
 
-            if created and not movie_data.get('coming_soon'):
-                # Create showtimes only for newly created "now showing" movies
-                for theater in all_theaters[:3]:
-                    for day in range(1, 8):
+            if coming_soon:
+                self.stdout.write(self.style.WARNING(f'Coming Soon movie: {movie.title}'))
+                continue
+            if past and end_date and end_date < today:
+                self.stdout.write(self.style.WARNING(f'Past movie: {movie.title}'))
+            elif mid_may:
+                self.stdout.write(self.style.WARNING(f'Mid-May ending movie: {movie.title}'))
+            else:
+                self.stdout.write(self.style.SUCCESS(f'Now Showing movie: {movie.title}'))
+
+            # Assign to theaters with specified distribution
+            if not (coming_soon or (past and end_date < today)):
+                num_theaters = random.choices([1, 2, 3], [0.7, 0.25, 0.05])[0]  # 70% 1 theater, 25% 2, 5% 3
+                assigned_theaters = random.sample(all_theaters, num_theaters)
+
+                for theater in assigned_theaters:
+                    theater_movie_map[theater.id].append(movie)
+
+                    show_date = today
+                    while show_date <= end_date:
                         Showtime.objects.get_or_create(
                             movie=movie,
                             theater=theater,
-                            date=today + timedelta(days=day),
+                            date=show_date,
                             time='18:00:00',
                             defaults={'price': movie_data.get('price', 1200)}
                         )
-                self.stdout.write(self.style.SUCCESS(f'Created movie: {movie.title}'))
-            else:
-                status = 'Coming Soon' if movie_data.get('coming_soon') else 'Updated'
-                self.stdout.write(self.style.WARNING(f'{status} movie: {movie.title}'))
+                        show_date += timedelta(days=1)
+
+        # Ensure each theater has at least 6 movies (at least 5 current)
+        for theater in all_theaters:
+            current_movies = [m for m in theater_movie_map[theater.id]
+                              if m.release_date <= today and (not hasattr(m, 'end_date') or m.end_date >= today)]
+
+            while len(current_movies) < 5 or len(theater_movie_map[theater.id]) < 6:
+                # Find movies not already in this theater
+                candidates = Movie.objects.filter(
+                    release_date__lte=today
+                ).exclude(
+                    id__in=[m.id for m in theater_movie_map[theater.id]]
+                )
+
+                if not candidates.exists():
+                    break
+
+                extra_movie = random.choice(candidates)
+                theater_movie_map[theater.id].append(extra_movie)
+                current_movies.append(extra_movie)
+
+                # Set end date 1-2 weeks from today for these additional movies
+                extra_end_date = today + timedelta(days=random.randint(7, 14))
+
+                show_date = today
+                while show_date <= extra_end_date:
+                    Showtime.objects.get_or_create(
+                        movie=extra_movie,
+                        theater=theater,
+                        date=show_date,
+                        time='20:30:00',
+                        defaults={'price': 1200}
+                    )
+                    show_date += timedelta(days=1)
 
         self.stdout.write(self.style.SUCCESS('Successfully populated movie database!'))

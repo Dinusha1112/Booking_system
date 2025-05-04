@@ -1,5 +1,6 @@
 from django import forms
-from .models import Booking, Seat
+from .models import Booking, Seat, BookedSeat
+
 
 class BookingForm(forms.ModelForm):
     class Meta:
@@ -12,6 +13,7 @@ class BookingForm(forms.ModelForm):
         if showtime:
             screen = showtime.theater.screen_set.first()
             if screen:
+                # Show ALL seats for this screen
                 self.fields['seats'].queryset = Seat.objects.filter(
                     screen=screen
                 ).order_by('row', 'seat_number')

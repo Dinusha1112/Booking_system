@@ -16,8 +16,12 @@ class UserProfile(models.Model):
 
     def calculate_rewards(self):
         from movies.models import Booking
-        bookings_count = Booking.objects.filter(user=self.user).count()
-        self.rewards_points = bookings_count * 10  # 10 points per booking
+        # Only count confirmed and completed bookings (not cancelled)
+        valid_bookings = Booking.objects.filter(
+            user=self.user,
+            is_cancelled=False
+        ).count()
+        self.rewards_points = valid_bookings * 10  # 10 points per valid booking
         self.save()
 
 @receiver(post_save, sender=User)

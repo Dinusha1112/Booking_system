@@ -71,8 +71,8 @@
                                         <input class="seat-checkbox" type="checkbox"
                                                name="seats" value="{{ seat.id }}"
                                                id="seat-{{ seat.id }}"
-                                               {% if seat.is_booked %}disabled{% endif %}>
-                                        <label class="seat-label {% if seat.is_booked %}booked{% endif %}"
+                                               {% if seat.id in booked_seat_ids %}disabled{% endif %}>
+                                        <label class="seat-label {% if seat.id in booked_seat_ids %}booked{% endif %}"
                                                for="seat-{{ seat.id }}"
                                                data-seat-number="{{ row.grouper }}{{ seat.seat_number }}"
                                                data-seat-price="{{ showtime.price }}">

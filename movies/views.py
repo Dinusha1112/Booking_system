@@ -105,13 +105,13 @@ def booking_view(request, showtime_id):
                 booking = Booking(
                     user=request.user,
                     showtime=showtime,
-                    total_price=showtime.price * len(selected_seats),
+                    total_price=showtime.price * len(form.cleaned_data['seats']),
                     payment_status=True
                 )
                 booking.save()
 
                 # Create BookedSeat records
-                for seat in selected_seats:
+                for seat in form.cleaned_data['seats']:
                     BookedSeat.objects.create(booking=booking, seat=seat)
 
                 # Update rewards

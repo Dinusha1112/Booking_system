@@ -72,8 +72,9 @@ def profile_view(request):
 
     # Calculate rewards
     profile.calculate_rewards()
+    rewards_points = profile.rewards_points
 
-    # Sample rewards
+    # Rewards
     rewards = [
         {'id': 1, 'name': 'Free Small Popcorn', 'description': 'Enjoy a free small popcorn on your next visit',
          'points_required': 50},
@@ -215,14 +216,39 @@ def check_reward_code(request):
 
     return JsonResponse({'valid': False, 'message': 'Invalid request'})
 
+
 @login_required
 def cancel_booking(request, booking_id):
     booking = get_object_or_404(Booking, id=booking_id, user=request.user)
-    if not booking.is_cancelled and booking.showtime.date >= timezone.now().date():
-        booking.is_cancelled = True
-        booking.cancelled_at = timezone.now()  # Optional: record cancellation time
-        booking.save()
-        messages.success(request, "Booking cancelled successfully")
-    else:
-        messages.error(request, "Cannot cancel this booking")
+
+    if booking.is_cancelled:
+        messages.error(request, "This booking is already cancelled")
+        return redirect('profile')
+
+    if booking.showtime.date < timezone.now().date():
+        messages.error(request, "Cannot cancel past bookings")
+        return redirect('profile')
+
+    # Mark seats as available by deleting BookedSeat records
+    booked_seats = booking.bookedseat_set.all()
+    for booked_seat in booked_seats:
+        # Optional: Mark seat as available if you're using is_booked flag
+        booked_seat.seat.is_booked = False
+        booked_seat.seat.save()
+
+    # Delete the booked seat records
+    booked_seats.delete()
+
+    # Deduct rewards points if this was a confirmed booking
+    profile = request.user.userprofile
+    if not booking.is_cancelled:  # Only deduct if wasn't already cancelled
+        profile.rewards_points = max(0, profile.rewards_points - 10)
+        profile.save()
+
+    # Mark booking as cancelled
+    booking.is_cancelled = True
+    booking.cancelled_at = timezone.now()
+    booking.save()
+
+    messages.success(request, "Booking cancelled successfully. 10 reward points deducted.")
     return redirect('profile')

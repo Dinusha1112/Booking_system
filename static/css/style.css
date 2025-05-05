@@ -11,11 +11,19 @@ body {
     overflow: hidden;
     border: none;
     margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .card:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card-footer {
+    margin-top: auto; /* Pushes footer to bottom */
+    padding: 1rem; /* Ensures consistent padding */
 }
 
 /* Movie Cards */
@@ -26,6 +34,11 @@ body {
     align-items: center;
     justify-content: center;
     background-color: #f0f0f0;
+}
+
+.movie-poster-fixed-height {
+    height: 400px;
+    object-fit: cover;
 }
 
 .movie-poster {
@@ -65,7 +78,6 @@ body {
     height: 40px;
     border: 1px solid #dee2e6;
     border-radius: 4px;
-    background-color: white;
     cursor: pointer;
     transition: all 0.2s;
     font-size: 0.8rem;
@@ -74,6 +86,7 @@ body {
 
 .seat-label:hover {
     background-color: #f8f9fa;
+    color: #000;
 }
 
 .seat-checkbox:checked + .seat-label {
@@ -167,3 +180,83 @@ body {
     padding: 5px 10px;
     margin-right: 8px;
 }
+
+.movie-poster-container {
+    height: 300px;
+    overflow: hidden;
+}
+
+.movie-poster {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.movie-poster:hover {
+    transform: scale(1.05);
+}
+
+.swiper {
+    padding-bottom: 30px;
+}
+
+.swiper-slide {
+    height: auto;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+    color: #dc3545; /* Red color to match your theme */
+    background: rgba(255, 255, 255, 0.8);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.swiper-pagination-bullet-active {
+    background: #dc3545;
+}
+
+/* Modern Dark Theme with Subtle Film Grain */
+body {
+    background:
+        linear-gradient(rgba(10, 10, 10, 0.92), rgba(10, 10, 10, 0.92)),
+        url('https://images.unsplash.com/photo-1518676590629-3dcbd9c5a5c9?ixlib=rb-4.0.3') center/cover no-repeat fixed;
+    color: #fff;
+    min-height: 100vh;
+}
+
+/* Adjust card backgrounds to stand out */
+.card {
+    background-color: rgba(30, 30, 36, 0.85);
+    border: 1px solid #333;
+    color: #eee;
+}
+
+/* Improve contrast for text */
+.text-muted {
+    color: #ffffff !important;
+}
+
+/* Better button styling */
+.btn-primary {
+    background-color: #e50914; /* Netflix-style red */
+    border-color: #e50914;
+}
+
+/* Make movie titles white in cards */
+.card-body .card-title {
+    color: white !important;
+}
+
+

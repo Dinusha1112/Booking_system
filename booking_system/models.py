@@ -16,8 +16,12 @@ class UserProfile(models.Model):
 
     def calculate_rewards(self):
         from movies.models import Booking
-        bookings_count = Booking.objects.filter(user=self.user).count()
-        self.rewards_points = bookings_count * 10  # 10 points per booking
+        # Only count confirmed and completed bookings (not cancelled)
+        valid_bookings = Booking.objects.filter(
+            user=self.user,
+            is_cancelled=False
+        ).count()
+        self.rewards_points = valid_bookings * 10  # 10 points per valid booking
         self.save()
 
 @receiver(post_save, sender=User)
@@ -67,3 +71,13 @@ class UserReward(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s {self.reward_name}"
+
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message from {self.name} - {self.subject}"

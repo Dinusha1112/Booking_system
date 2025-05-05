@@ -159,7 +159,7 @@
 <!-- Sampath Bank Modal -->
 <div class="modal fade" id="sampathModal" tabindex="-1" aria-labelledby="sampathModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content" style="color: #000">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="sampathModalLabel">Sampath Bank Offer</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -192,7 +192,7 @@
 <!-- HSBC Modal -->
 <div class="modal fade" id="hsbcModal" tabindex="-1" aria-labelledby="hsbcModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content" style="color: #000">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="hsbcModalLabel">HSBC Offer</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -225,7 +225,7 @@
 <!-- NTB Modal -->
 <div class="modal fade" id="ntbModal" tabindex="-1" aria-labelledby="ntbModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content" style="color: #000">
             <div class="modal-header bg-warning text-dark">
                 <h5 class="modal-title" id="ntbModalLabel">NTB Offer</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -259,7 +259,7 @@
 <!-- SLASH Modal -->
 <div class="modal fade" id="slashModal" tabindex="-1" aria-labelledby="slashModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content" style="color: #000">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title" id="slashModalLabel">SLASH Partnership</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -296,7 +296,7 @@
 <!-- Rewards Card Modal -->
 <div class="modal fade" id="rewardsModal" tabindex="-1" aria-labelledby="rewardsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content" style="color: #000">
             <div class="modal-header bg-success text-white">
                 <h5 class="modal-title" id="rewardsModalLabel">Rewards Program</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -335,7 +335,7 @@
 <!-- Student Modal -->
 <div class="modal fade" id="studentModal" tabindex="-1" aria-labelledby="studentModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content" style="color: #000">
             <div class="modal-header bg-info text-white">
                 <h5 class="modal-title" id="studentModalLabel">Student Offer</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -370,7 +370,7 @@
 <!-- Family Modal -->
 <div class="modal fade" id="familyModal" tabindex="-1" aria-labelledby="familyModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content" style="color: #000">
             <div class="modal-header bg-purple text-white">
                 <h5 class="modal-title" id="familyModalLabel">Family Package</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -411,8 +411,8 @@
 {% for promo in promotions %}
 <div class="modal fade" id="promoModal{{ forloop.counter }}" tabindex="-1" aria-labelledby="promoModalLabel{{ forloop.counter }}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white">
+        <div class="modal-content" style="color: #000">
+            <div class="modal-header" color="black">
                 <h5 class="modal-title" id="promoModalLabel{{ forloop.counter }}">{{ promo.title }}</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -444,6 +444,7 @@
 
 {% block extra_css %}
 <style>
+    /* Purple theme classes */
     .bg-purple {
         background-color: #6f42c1;
     }
@@ -458,6 +459,7 @@
         color: white;
     }
 
+    /* Promo card styling */
     .promo-image-container {
         height: 180px;
         overflow: hidden;
@@ -474,27 +476,121 @@
         transform: scale(1.05);
     }
 
+    /* Card hover effects */
     .card {
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background-color: #1e1e1e;
+        color: #ffffff;
+        border: 1px solid #333;
     }
 
     .card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Black Modal Styling */
+    .modal-dialog .modal-content {
+        background-color: #000 !important;
+        border: 1px solid #333 !important;
+        color: #000 !important;
     }
 
     .modal-header {
-        border-bottom: none;
+        background-color: #111 !important;
+        border-bottom: 1px solid #333 !important;
     }
 
-    .modal-content {
-        border-radius: 10px;
-        overflow: hidden;
+    .modal-body {
+        background-color: #000 !important;
+        color: #fff !important;
     }
 
+    .modal-footer {
+        background-color: #111 !important;
+        border-top: 1px solid #333 !important;
+    }
+
+    /* Colored headers for different offer types */
+    #sampathModal .modal-header,
+    #slashModal .modal-header {
+        background-color: #0d6efd !important;
+    }
+
+    #hsbcModal .modal-header {
+        background-color: #dc3545 !important;
+    }
+
+    #ntbModal .modal-header {
+        background-color: #ffc107 !important;
+        color: #000 !important;
+    }
+
+    #rewardsModal .modal-header,
+    #promoModal .modal-header {
+        background-color: #198754 !important;
+    }
+
+    #studentModal .modal-header {
+        background-color: #0dcaf0 !important;
+    }
+
+    #familyModal .modal-header {
+        background-color: #6f42c1 !important;
+    }
+
+    /* Text elements */
+    .modal-title,
+    .modal-body h4,
+    .modal-body h5,
+    .modal-body h6,
+    .modal-body p,
+    .modal-body li,
+    .modal-body strong,
+    .modal-body ol,
+    .modal-body ul {
+        color: #fff !important;
+    }
+
+    /* Alert boxes */
+    .modal-body .alert-info {
+        background-color: #0d2b3a !important;
+        color: #fff !important;
+        border-color: #1a3a4a !important;
+    }
+
+    .modal-body .alert-warning {
+        background-color: #3a2b0d !important;
+        color: #fff !important;
+        border-color: #4a3a1a !important;
+    }
+
+    /* Close button */
+    .btn-close {
+        filter: invert(1) brightness(2) !important;
+        opacity: 0.8;
+    }
+    .btn-close:hover {
+        opacity: 1;
+    }
+
+    /* Special case for NTB modal */
+    #ntbModal .btn-close {
+        filter: none !important;
+    }
+
+    /* Images in modals */
     .modal-body img {
         border-radius: 5px;
         margin-bottom: 15px;
+        border: 1px solid #444;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .modal-content {
+            margin: 10px;
+        }
     }
 </style>
 {% endblock %}

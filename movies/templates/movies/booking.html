@@ -8,7 +8,7 @@
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body">
                     <h2 class="card-title fw-bold mb-4">Booking for {{ showtime.movie.title }}</h2>
-                    <div class="mb-4 p-3 bg-light rounded">
+                    <div class="mb-4 p-3 bg-dark rounded">
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label"><strong>Theater:</strong></label>
@@ -208,10 +208,6 @@
         border: 1px solid #555;
     }
 
-    .seat-checkbox:checked + .seat-label {
-        background-color: #e50914;
-        color: white;
-    }
 
     .seat-checkbox:disabled + .seat-label {
         background-color: #333;
@@ -245,31 +241,9 @@
         color: #000 !important;  /* Black color */
     }
 
-        /* Force form labels to black */
-    .form-label,
-    .form-label strong {
+    /* Force form labels to black */
+    .form-label, .form-label strong {
         color: #000 !important;
-        text-shadow: none !important;
-    }
-
-    /* Force seat labels to black */
-    .seat-label,
-    .seat-label:hover {
-        color: #000 !important;
-        background-color: #fff !important; /* White background for contrast */
-        border-color: #000 !important;
-    }
-
-    /* For selected seats */
-    .seat-checkbox:checked + .seat-label {
-        color: #fff !important; /* White text on red background */
-        background-color: #e50914 !important;
-    }
-
-    /* For booked seats */
-    .seat-checkbox:disabled + .seat-label {
-        color: #fff !important; /* White text on gray background */
-        background-color: #333 !important;
     }
 </style>
 {% endblock %}

@@ -78,7 +78,6 @@ body {
     height: 40px;
     border: 1px solid #dee2e6;
     border-radius: 4px;
-    background-color: white;
     cursor: pointer;
     transition: all 0.2s;
     font-size: 0.8rem;
@@ -87,6 +86,7 @@ body {
 
 .seat-label:hover {
     background-color: #f8f9fa;
+    color: #000;
 }
 
 .seat-checkbox:checked + .seat-label {
@@ -258,3 +258,5 @@ body {
 .card-body .card-title {
     color: white !important;
 }
+
+

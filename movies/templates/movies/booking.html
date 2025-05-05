@@ -101,7 +101,7 @@
                             </div>
                         </div>
 
-                        <div class="booking-summary bg-light p-3 rounded mb-4">
+                        <div class="booking-summary bg-dark p-3 rounded mb-4">
                             <h5 class="mb-3">Booking Summary</h5>
                             <div class="selected-seats mb-2">
                                 <strong>Selected Seats:</strong>
@@ -162,116 +162,114 @@
 
 {% block extra_css %}
 <style>
-    .seat-map-container {
-        padding-bottom: 10px;
+    /* Dark Theme Base */
+    .card {
+        background-color: #1e1e1e;
+        color: #ffffff;
+        border: 1px solid #333;
     }
 
-    .seat-row {
-        display: flex;
-        justify-content: center;
-        gap: 4px;
-        margin-bottom: 4px;
-    }
-
-    .seat-container {
-        position: relative;
-        text-align: center;
-    }
-
-    .seat-checkbox {
-        position: absolute;
-        opacity: 0;
-        height: 0;
-        width: 0;
-    }
-
-    .seat-label {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 36px;
-        height: 36px;
-        border: 1px solid #dee2e6;
-        border-radius: 4px;
-        background-color: white;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-size: 0.75rem;
-        font-weight: 500;
-    }
-
-    .seat-label:hover {
-        transform: scale(1.05);
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .seat-checkbox:checked + .seat-label {
-        background-color: #0d6efd;
-        color: white;
-        border-color: #0d6efd;
-        transform: scale(1.05);
-        box-shadow: 0 1px 4px rgba(13, 110, 253, 0.3);
-    }
-
-    .seat-checkbox:disabled + .seat-label {
-        background-color: #dc3545;
-        color: white;
-        border-color: #dc3545;
-        cursor: not-allowed;
-        opacity: 0.7;
-    }
-
-    .screen {
-        font-weight: bold;
-        letter-spacing: 2px;
-        margin: 15px 0;
-        padding: 8px;
-        background: linear-gradient(to right, #343a40, #495057, #343a40);
-        color: white;
-        text-align: center;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .seat-available {
-        background-color: white;
-        border: 1px solid #dee2e6;
-    }
-
-    .seat-selected {
-        background-color: #0d6efd;
-        border: 1px solid #0d6efd;
-    }
-
-    .seat-booked {
-        background-color: #dc3545;
-        border: 1px solid #dc3545;
+    /* Fix white background areas */
+    .bg-light {
+        background-color: #2d2d2d !important;
+        color: #ffffff !important;
+        border: 1px solid #444;
     }
 
     .booking-summary {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+        background-color: #2d2d2d;
+        color: #ffffff;
+        border: 1px solid #444;
     }
 
-    #confirm-btn:disabled {
-        opacity: 0.65;
+    .seat-legend {
+        background-color: #2d2d2d;
+        color: #ffffff;
+        border: 1px solid #444;
     }
 
+    /* Form elements */
+    .form-control, .form-select {
+        background-color: #3a3a3a;
+        color: #ffffff;
+        border: 1px solid #555;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background-color: #3a3a3a;
+        color: #ffffff;
+        border-color: #e50914;
+    }
+
+    /* Seat styling */
+    .seat-label {
+        background-color: #3a3a3a;
+        color: #000000 !important;
+        border: 1px solid #555;
+    }
+
+    .seat-checkbox:checked + .seat-label {
+        background-color: #e50914;
+        color: white;
+    }
+
+    .seat-checkbox:disabled + .seat-label {
+        background-color: #333;
+        color: #999;
+    }
+
+    /* Text adjustments */
+    .text-muted {
+        color: #aaa !important;
+    }
+
+    small {
+        color: #ddd !important;
+    }
+
+    /* Keep existing screen styling */
+    .screen {
+        background: linear-gradient(to right, #e50914, #b00710, #e50914);
+        color: white;
+    }
+
+    /* Responsive adjustments */
     @media (max-width: 768px) {
         .seat-label {
-            width: 32px;
-            height: 32px;
-            font-size: 0.7rem;
-        }
-
-        .seat-row {
-            gap: 3px;
+            width: 36px;
+            height: 36px;
         }
     }
 
-    .form-select {
-        cursor: pointer;
+    .form-label {
+        color: #000 !important;  /* Black color */
+    }
+
+        /* Force form labels to black */
+    .form-label,
+    .form-label strong {
+        color: #000 !important;
+        text-shadow: none !important;
+    }
+
+    /* Force seat labels to black */
+    .seat-label,
+    .seat-label:hover {
+        color: #000 !important;
+        background-color: #fff !important; /* White background for contrast */
+        border-color: #000 !important;
+    }
+
+    /* For selected seats */
+    .seat-checkbox:checked + .seat-label {
+        color: #fff !important; /* White text on red background */
+        background-color: #e50914 !important;
+    }
+
+    /* For booked seats */
+    .seat-checkbox:disabled + .seat-label {
+        color: #fff !important; /* White text on gray background */
+        background-color: #333 !important;
     }
 </style>
 {% endblock %}

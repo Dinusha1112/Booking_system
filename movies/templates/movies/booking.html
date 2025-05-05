@@ -279,10 +279,9 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Get the current URL path and extract the showtime ID
-    const pathParts = window.location.pathname.split('/');
-    const showtimeId = pathParts[pathParts.length - 2];
+    // Get the current showtime and movie IDs
     const movieId = {{ showtime.movie.id }};
+    const showtimeId = {{ showtime.id }};
 
     // Function to update the showtime
     function updateShowtime() {
@@ -291,9 +290,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const time = document.getElementById('time-select').value;
 
         // Construct the correct URL to find the matching showtime
-        const newUrl = `/movies/find-showtime/?movie_id={{ showtime.movie.id }}&theater=${theaterId}&date=${date}&time=${time}`;
-
-        // Redirect to find the matching showtime
+        const newUrl = `/movies/find-showtime/?movie_id=${movieId}&theater=${theaterId}&date=${date}&time=${time}`;
         window.location.href = newUrl;
     }
 
@@ -302,18 +299,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('date-select').addEventListener('change', updateShowtime);
     document.getElementById('time-select').addEventListener('change', updateShowtime);
 
-    if (theaterSelect) {
-        theaterSelect.addEventListener('change', updateShowtime);
-    }
-    if (dateSelect) {
-        dateSelect.addEventListener('change', updateShowtime);
-    }
-    if (timeSelect) {
-        timeSelect.addEventListener('change', updateShowtime);
-    }
-
     // Seat selection functionality
-    const seatCheckboxes = document.querySelectorAll('.seat-checkbox');
+    const seatCheckboxes = document.querySelectorAll('.seat-checkbox:not(:disabled)');
     const selectedSeatsList = document.getElementById('selected-seats-list');
     const subtotalPrice = document.getElementById('subtotal-price');
     const totalPrice = document.getElementById('total-price');
@@ -322,40 +309,31 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedSeats = [];
 
     // Handle seat selection
-    if (seatCheckboxes) {
-        seatCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const seatLabel = this.nextElementSibling;
-                const seatId = this.value;
-                const seatNumber = seatLabel.dataset.seatNumber;
-                const seatPrice = parseFloat(seatLabel.dataset.seatPrice);
+    seatCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const seatLabel = this.nextElementSibling;
+            const seatId = this.value;
+            const seatNumber = seatLabel.dataset.seatNumber;
+            const seatPrice = parseFloat(seatLabel.dataset.seatPrice);
 
-                if (this.checked) {
-                    selectedSeats.push({
-                        id: seatId,
-                        number: seatNumber,
-                        price: seatPrice
-                    });
-                    seatLabel.classList.add('selected');
-                } else {
-                    selectedSeats = selectedSeats.filter(seat => seat.id !== seatId);
-                    seatLabel.classList.remove('selected');
-                }
-
-                updateBookingSummary();
-            });
+            if (this.checked) {
+                selectedSeats.push({
+                    id: seatId,
+                    number: seatNumber,
+                    price: seatPrice
+                });
+            } else {
+                selectedSeats = selectedSeats.filter(seat => seat.id !== seatId);
+            }
+            updateBookingSummary();
         });
-    }
+    });
 
     function updateBookingSummary() {
-        if (!selectedSeatsList || !subtotalPrice || !totalPrice || !confirmBtn) return;
-
         // Update selected seats list
-        if (selectedSeats.length > 0) {
-            selectedSeatsList.textContent = selectedSeats.map(seat => seat.number).join(', ');
-        } else {
-            selectedSeatsList.textContent = 'None';
-        }
+        selectedSeatsList.textContent = selectedSeats.length > 0
+            ? selectedSeats.map(seat => seat.number).join(', ')
+            : 'None';
 
         // Calculate prices
         const subtotal = selectedSeats.reduce((sum, seat) => sum + seat.price, 0);
@@ -368,25 +346,16 @@ document.addEventListener('DOMContentLoaded', function() {
         confirmBtn.disabled = selectedSeats.length === 0;
     }
 
-    // Add animation when hovering over seats
-    const seatLabels = document.querySelectorAll('.seat-label:not(.booked)');
-    if (seatLabels) {
-        seatLabels.forEach(label => {
-            label.addEventListener('mouseenter', function() {
-                if (!this.previousElementSibling.checked) {
-                    this.style.transform = 'scale(1.1)';
-                    this.style.boxShadow = '0 1px 4px rgba(0, 0, 0, 0.15)';
-                }
-            });
+    // Form submission handler
+    document.getElementById('booking-form').addEventListener('submit', function(e) {
+        if (selectedSeats.length === 0) {
+            e.preventDefault();
+            alert('Please select at least one seat');
+        }
+    });
 
-            label.addEventListener('mouseleave', function() {
-                if (!this.previousElementSibling.checked) {
-                    this.style.transform = '';
-                    this.style.boxShadow = '';
-                }
-            });
-        });
-    }
+    // Initialize the booking summary
+    updateBookingSummary();
 });
 </script>
 {% endblock %}

@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Movie, Theater, Showtime, Seat, Booking, BookedSeat
 from .forms import BookingForm
 from django.db import models
-
+from django.contrib import messages
 
 def movies_view(request):
     current_date = timezone.now().date()
@@ -70,22 +70,33 @@ def theaters_view(request):
 def booking_view(request, showtime_id):
     showtime = get_object_or_404(Showtime, id=showtime_id)
 
-    # Get theaters, dates and times (unchanged)
+    # Get theaters showing this movie with upcoming showtimes
     movie_theaters = Theater.objects.filter(
         showtime__movie=showtime.movie,
         showtime__date__gte=timezone.now().date()
     ).distinct()
 
+    # Get available dates for the CURRENT THEATER
     available_dates = Showtime.objects.filter(
-        movie=showtime.movie
+        movie=showtime.movie,
+        theater=showtime.theater,
+        date__gte=timezone.now().date()
     ).dates('date', 'day').distinct()
 
+    # Get available times for the CURRENT DATE
     available_times = Showtime.objects.filter(
         movie=showtime.movie,
+        theater=showtime.theater,
         date=showtime.date
     ).order_by('time').values_list('time', flat=True).distinct()
 
-    # Get all booked seat IDs for this showtime
+    # Get screen for current showtime
+    screen = showtime.theater.screen_set.first()
+    if not screen:
+        messages.error(request, "No screen configuration found for this theater")
+        return redirect('movies:movies')
+
+    # Get all booked seat IDs for THIS SPECIFIC showtime only
     booked_seat_ids = BookedSeat.objects.filter(
         booking__showtime=showtime,
         booking__is_cancelled=False
@@ -100,26 +111,29 @@ def booking_view(request, showtime_id):
             conflict_seats = [seat for seat in selected_seats if seat.id in booked_seat_ids]
             if conflict_seats:
                 messages.error(request, f"Seat(s) {', '.join(str(seat) for seat in conflict_seats)} are already booked")
-            else:
-                # Create booking
-                booking = Booking(
-                    user=request.user,
-                    showtime=showtime,
-                    total_price=showtime.price * len(form.cleaned_data['seats']),
-                    payment_status=True
-                )
-                booking.save()
+                return redirect('movies:booking', showtime_id=showtime_id)
 
-                # Create BookedSeat records
-                for seat in form.cleaned_data['seats']:
-                    BookedSeat.objects.create(booking=booking, seat=seat)
+            # Create booking
+            booking = Booking(
+                user=request.user,
+                showtime=showtime,
+                total_price=showtime.price * len(selected_seats),
+                payment_status=True
+            )
+            booking.save()
 
-                # Update rewards
-                profile = request.user.userprofile
-                profile.rewards_points += 10
-                profile.save()
+            # Create BookedSeat records
+            for seat in selected_seats:
+                BookedSeat.objects.create(booking=booking, seat=seat)
+                seat.is_booked = True
+                seat.save()
 
-                return redirect('movies:booking_confirmation', booking_id=booking.id)
+            # Update rewards
+            profile = request.user.userprofile
+            profile.rewards_points += 10 * len(selected_seats)
+            profile.save()
+
+            return redirect('movies:booking_confirmation', booking_id=booking.id)
     else:
         form = BookingForm(showtime=showtime)
 
@@ -129,7 +143,8 @@ def booking_view(request, showtime_id):
         'available_dates': available_dates,
         'available_times': available_times,
         'form': form,
-        'booked_seat_ids': list(booked_seat_ids)  # Convert to list for template
+        'booked_seat_ids': list(booked_seat_ids),
+        'screen': screen  # Pass screen to template
     })
 
 @login_required
@@ -139,3 +154,30 @@ def booking_confirmation(request, booking_id):
         'booking': booking
     })
 
+
+def find_showtime(request):
+    movie_id = request.GET.get('movie_id')
+    theater_id = request.GET.get('theater')
+    date = request.GET.get('date')
+    time = request.GET.get('time')
+
+    try:
+        showtime = Showtime.objects.get(
+            movie_id=movie_id,
+            theater_id=theater_id,
+            date=date,
+            time=time
+        )
+        return redirect('movies:booking', showtime_id=showtime.id)
+    except (Showtime.DoesNotExist, ValueError):
+        messages.error(request, "Selected showtime not available")
+        # Try to find any available showtime for the same movie and theater
+        available_showtime = Showtime.objects.filter(
+            movie_id=movie_id,
+            theater_id=theater_id,
+            date__gte=timezone.now().date()
+        ).order_by('date', 'time').first()
+
+        if available_showtime:
+            return redirect('movies:booking', showtime_id=available_showtime.id)
+        return redirect('movies:movies')

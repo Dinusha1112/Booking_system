@@ -20,18 +20,18 @@
                             </div>
                         </div>
                         <h3 class="mb-2">{{ user.get_full_name|default:user.username }}</h3>
-                        <p class="text-muted mb-3">
+                        <p class="text mb-3">
                             <i class="bi bi-award-fill"></i> Member since {{ user.date_joined|date:"M Y" }}
                         </p>
 
                         <div class="profile-stats d-flex justify-content-around mb-4">
                             <div>
                                 <h5 class="mb-0">{{ bookings_count }}</h5>
-                                <small class="text-muted">Bookings</small>
+                                <small class="text">Bookings</small>
                             </div>
                             <div>
                                 <h5 class="mb-0">{{ rewards_points }}</h5>
-                                <small class="text-muted">Reward Points</small>
+                                <small class="text">Reward Points</small>
                             </div>
                         </div>
 
@@ -68,7 +68,7 @@
                                  aria-valuemax="100">
                             </div>
                         </div>
-                        <p class="small text-muted">
+                        <p class="small text">
                             You have {{ rewards_points }} points.
                         </p>
                         <button class="btn btn-outline-success btn-sm" data-bs-toggle="modal" data-bs-target="#rewardsModal">
@@ -97,7 +97,7 @@
                         {% if upcoming_bookings %}
                         <div class="table-responsive">
                             <table class="table table-hover">
-                                <thead class="table-light">
+                                <thead class="table">
                                     <tr>
                                         <th>Movie</th>
                                         <th>Details</th>
@@ -115,13 +115,13 @@
                                                      class="rounded me-3" width="50" height="75" alt="{{ booking.showtime.movie.title }} poster">
                                                 <div>
                                                     <h6 class="mb-0">{{ booking.showtime.movie.title }}</h6>
-                                                    <small class="text-muted">{{ booking.seats.count }} seat(s)</small>
+                                                    <small class="text">{{ booking.seats.count }} seat(s)</small>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
                                             <small class="d-block">{{ booking.showtime.theater.name }}</small>
-                                            <small class="text-muted">
+                                            <small class="text">
                                                 {{ booking.showtime.time|time:"g:i A" }} •
                                                 {% for booked_seat in booking.bookedseat_set.all %}
                                                     {{ booked_seat.seat.row }}{{ booked_seat.seat.seat_number }}{% if not forloop.last %}, {% endif %}
@@ -150,7 +150,7 @@
                         <div class="text-center py-5">
                             <img src="/media/images/movie_icon.jpg" width="200" class="mb-4">
                             <h5>No upcoming bookings</h5>
-                            <p class="text-muted">Your upcoming movie bookings will appear here</p>
+                            <p class="text">Your upcoming movie bookings will appear here</p>
                             <a href="{% url 'movies:movies' %}" class="btn btn-primary">
                                 <i class="bi bi-ticket-perforated me-2"></i>Book a Movie
                             </a>
@@ -181,13 +181,13 @@
                                                      class="rounded me-3" width="50" height="75" alt="{{ booking.showtime.movie.title }} poster">
                                                 <div>
                                                     <h6 class="mb-0">{{ booking.showtime.movie.title }}</h6>
-                                                    <small class="text-muted">{{ booking.seats.count }} seat(s)</small>
+                                                    <small class="text">{{ booking.seats.count }} seat(s)</small>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
                                             <small class="d-block">{{ booking.showtime.theater.name }}</small>
-                                            <small class="text-muted">
+                                            <small class="text">
                                                 {{ booking.showtime.time|time:"g:i A" }} •
                                                 {% for booked_seat in booking.bookedseat_set.all %}
                                                     {{ booked_seat.seat.row }}{{ booked_seat.seat.seat_number }}{% if not forloop.last %}, {% endif %}
@@ -199,7 +199,7 @@
                                             <span class="badge bg-warning">Completed</span>
                                         </td>
                                         <td>
-                                            <span class="text-muted small">N/A</span>
+                                            <span class="text small">N/A</span>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -210,7 +210,7 @@
                         <div class="text-center py-5">
                             <img src="/media/images/movie_icon.jpg" width="200" class="mb-4">
                             <h5>No past bookings</h5>
-                            <p class="text-muted">Your completed movie bookings will appear here</p>
+                            <p class="text">Your completed movie bookings will appear here</p>
                         </div>
                         {% endif %}
                     </div>
@@ -238,13 +238,13 @@
                                                      class="rounded me-3" width="50" height="75" alt="{{ booking.showtime.movie.title }} poster">
                                                 <div>
                                                     <h6 class="mb-0">{{ booking.showtime.movie.title }}</h6>
-                                                    <small class="text-muted">{{ booking.seats.count }} seat(s)</small>
+                                                    <small class="text">{{ booking.seats.count }} seat(s)</small>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>
                                             <small class="d-block">{{ booking.showtime.theater.name }}</small>
-                                            <small class="text-muted">
+                                            <small class="text">
                                                 {{ booking.showtime.time|time:"g:i A" }} •
                                                 {% for booked_seat in booking.bookedseat_set.all %}
                                                     {{ booked_seat.seat.row }}{{ booked_seat.seat.seat_number }}{% if not forloop.last %}, {% endif %}
@@ -256,7 +256,7 @@
                                             <span class="badge bg-danger">Cancelled</span>
                                         </td>
                                         <td>
-                                            <span class="text-muted small">N/A</span>
+                                            <span class="text small">N/A</span>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -267,7 +267,7 @@
                         <div class="text-center py-5">
                             <img src="/media/images/movie_icon.jpg" width="200" class="mb-4">
                             <h5>No cancelled bookings</h5>
-                            <p class="text-muted">Your cancelled movie bookings will appear here</p>
+                            <p class="text">Your cancelled movie bookings will appear here</p>
                         </div>
                         {% endif %}
                     </div>
@@ -318,7 +318,6 @@
 
     .rewards-card {
         border-radius: 15px;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         border: none;
     }
 
@@ -341,7 +340,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="rewardsModalLabel">Available Rewards For This Month</h5>
+                <h5 class="modal-title" id="rewardsModalLabel" style="color: #000 !important;">Available Rewards For This Month</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -350,7 +349,7 @@
                     <div class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="mb-1">{{ reward.name }}</h6>
-                            <small class="text-muted">{{ reward.description }}</small>
+                            <small class="text">{{ reward.description }}</small>
                             <div class="mt-2">
                                 <span class="badge bg-secondary">
                                     {{ reward.points_required }} points needed
@@ -371,7 +370,7 @@
                     </div>
                     {% empty %}
                     <div class="list-group-item">
-                        <p class="text-muted mb-0">No rewards available at this time</p>
+                        <p class="text mb-0">No rewards available at this time</p>
                     </div>
                     {% endfor %}
                 </div>

@@ -8,7 +8,7 @@
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body">
                     <h2 class="card-title fw-bold mb-4">Booking for {{ showtime.movie.title }}</h2>
-                    <div class="mb-4 p-3 bg-light rounded">
+                    <div class="mb-4 p-3 bg-dark rounded">
                         <div class="row g-3">
                             <div class="col-md-4">
                                 <label class="form-label"><strong>Theater:</strong></label>
@@ -25,9 +25,9 @@
                                 <label class="form-label"><strong>Date:</strong></label>
                                 <select class="form-select" id="date-select">
                                     {% for date in available_dates %}
-                                        <option value="{{ date }}"
+                                        <option value="{{ date|date:'Y-m-d' }}"
                                                 {% if date == showtime.date %}selected{% endif %}>
-                                            {{ date }}
+                                            {{ date|date:"M d, Y" }}
                                         </option>
                                     {% endfor %}
                                 </select>
@@ -36,7 +36,7 @@
                                 <label class="form-label"><strong>Time:</strong></label>
                                 <select class="form-select" id="time-select">
                                     {% for time in available_times %}
-                                        <option value="{{ time }}"
+                                        <option value="{{ time|date:'H:i:s' }}"
                                                 {% if time == showtime.time %}selected{% endif %}>
                                             {{ time|time:"g:i A" }}
                                         </option>
@@ -101,7 +101,7 @@
                             </div>
                         </div>
 
-                        <div class="booking-summary bg-light p-3 rounded mb-4">
+                        <div class="booking-summary bg-dark p-3 rounded mb-4">
                             <h5 class="mb-3">Booking Summary</h5>
                             <div class="selected-seats mb-2">
                                 <strong>Selected Seats:</strong>
@@ -162,116 +162,88 @@
 
 {% block extra_css %}
 <style>
-    .seat-map-container {
-        padding-bottom: 10px;
+    /* Dark Theme Base */
+    .card {
+        background-color: #1e1e1e;
+        color: #ffffff;
+        border: 1px solid #333;
     }
 
-    .seat-row {
-        display: flex;
-        justify-content: center;
-        gap: 4px;
-        margin-bottom: 4px;
-    }
-
-    .seat-container {
-        position: relative;
-        text-align: center;
-    }
-
-    .seat-checkbox {
-        position: absolute;
-        opacity: 0;
-        height: 0;
-        width: 0;
-    }
-
-    .seat-label {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 36px;
-        height: 36px;
-        border: 1px solid #dee2e6;
-        border-radius: 4px;
-        background-color: white;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-size: 0.75rem;
-        font-weight: 500;
-    }
-
-    .seat-label:hover {
-        transform: scale(1.05);
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .seat-checkbox:checked + .seat-label {
-        background-color: #0d6efd;
-        color: white;
-        border-color: #0d6efd;
-        transform: scale(1.05);
-        box-shadow: 0 1px 4px rgba(13, 110, 253, 0.3);
-    }
-
-    .seat-checkbox:disabled + .seat-label {
-        background-color: #dc3545;
-        color: white;
-        border-color: #dc3545;
-        cursor: not-allowed;
-        opacity: 0.7;
-    }
-
-    .screen {
-        font-weight: bold;
-        letter-spacing: 2px;
-        margin: 15px 0;
-        padding: 8px;
-        background: linear-gradient(to right, #343a40, #495057, #343a40);
-        color: white;
-        text-align: center;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .seat-available {
-        background-color: white;
-        border: 1px solid #dee2e6;
-    }
-
-    .seat-selected {
-        background-color: #0d6efd;
-        border: 1px solid #0d6efd;
-    }
-
-    .seat-booked {
-        background-color: #dc3545;
-        border: 1px solid #dc3545;
+    /* Fix white background areas */
+    .bg-light {
+        background-color: #2d2d2d !important;
+        color: #ffffff !important;
+        border: 1px solid #444;
     }
 
     .booking-summary {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+        background-color: #2d2d2d;
+        color: #ffffff;
+        border: 1px solid #444;
     }
 
-    #confirm-btn:disabled {
-        opacity: 0.65;
+    .seat-legend {
+        background-color: #2d2d2d;
+        color: #ffffff;
+        border: 1px solid #444;
     }
 
+    /* Form elements */
+    .form-control, .form-select {
+        background-color: #3a3a3a;
+        color: #ffffff;
+        border: 1px solid #555;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background-color: #3a3a3a;
+        color: #ffffff;
+        border-color: #e50914;
+    }
+
+    /* Seat styling */
+    .seat-label {
+        background-color: #3a3a3a;
+        color: #000000 !important;
+        border: 1px solid #555;
+    }
+
+
+    .seat-checkbox:disabled + .seat-label {
+        background-color: #333;
+        color: #999;
+    }
+
+    /* Text adjustments */
+    .text-muted {
+        color: #aaa !important;
+    }
+
+    small {
+        color: #ddd !important;
+    }
+
+    /* Keep existing screen styling */
+    .screen {
+        background: linear-gradient(to right, #e50914, #b00710, #e50914);
+        color: white;
+    }
+
+    /* Responsive adjustments */
     @media (max-width: 768px) {
         .seat-label {
-            width: 32px;
-            height: 32px;
-            font-size: 0.7rem;
-        }
-
-        .seat-row {
-            gap: 3px;
+            width: 36px;
+            height: 36px;
         }
     }
 
-    .form-select {
-        cursor: pointer;
+    .form-label {
+        color: #000 !important;  /* Black color */
+    }
+
+    /* Force form labels to black */
+    .form-label, .form-label strong {
+        color: #000 !important;
     }
 </style>
 {% endblock %}
@@ -279,25 +251,28 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Get the current showtime and movie IDs
+    const movieId = {{ showtime.movie.id }};
+    const showtimeId = {{ showtime.id }};
 
-        // Add change event listeners for the dropdowns
-    document.getElementById('theater-select').addEventListener('change', function() {
+    // Function to update the showtime
+    function updateShowtime() {
+        const theaterId = document.getElementById('theater-select').value;
+        const date = document.getElementById('date-select').value;
+        const time = document.getElementById('time-select').value;
 
-        // Handle theater change
-        console.log('Theater changed to:', this.value);
-    });
+        // Construct the correct URL to find the matching showtime
+        const newUrl = `/movies/find-showtime/?movie_id=${movieId}&theater=${theaterId}&date=${date}&time=${time}`;
+        window.location.href = newUrl;
+    }
 
-    document.getElementById('date-select').addEventListener('change', function() {
-        // Handle date change
-        console.log('Date changed to:', this.value);
-    });
+    // Add change event listeners for the dropdowns
+    document.getElementById('theater-select').addEventListener('change', updateShowtime);
+    document.getElementById('date-select').addEventListener('change', updateShowtime);
+    document.getElementById('time-select').addEventListener('change', updateShowtime);
 
-    document.getElementById('time-select').addEventListener('change', function() {
-        // Handle time change
-        console.log('Time changed to:', this.value);
-    });
-
-    const seatCheckboxes = document.querySelectorAll('.seat-checkbox');
+    // Seat selection functionality
+    const seatCheckboxes = document.querySelectorAll('.seat-checkbox:not(:disabled)');
     const selectedSeatsList = document.getElementById('selected-seats-list');
     const subtotalPrice = document.getElementById('subtotal-price');
     const totalPrice = document.getElementById('total-price');
@@ -310,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function() {
         checkbox.addEventListener('change', function() {
             const seatLabel = this.nextElementSibling;
             const seatId = this.value;
-            const seatNumber = seatLabel.parentElement.getAttribute('data-seat-id').slice(0,1) + seatLabel.textContent.trim();
+            const seatNumber = seatLabel.dataset.seatNumber;
             const seatPrice = parseFloat(seatLabel.dataset.seatPrice);
 
             if (this.checked) {
@@ -319,23 +294,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     number: seatNumber,
                     price: seatPrice
                 });
-                seatLabel.classList.add('selected');
             } else {
                 selectedSeats = selectedSeats.filter(seat => seat.id !== seatId);
-                seatLabel.classList.remove('selected');
             }
-
             updateBookingSummary();
         });
     });
 
     function updateBookingSummary() {
         // Update selected seats list
-        if (selectedSeats.length > 0) {
-            selectedSeatsList.textContent = selectedSeats.map(seat => seat.number).join(', ');
-        } else {
-            selectedSeatsList.textContent = 'None';
-        }
+        selectedSeatsList.textContent = selectedSeats.length > 0
+            ? selectedSeats.map(seat => seat.number).join(', ')
+            : 'None';
 
         // Calculate prices
         const subtotal = selectedSeats.reduce((sum, seat) => sum + seat.price, 0);
@@ -348,22 +318,16 @@ document.addEventListener('DOMContentLoaded', function() {
         confirmBtn.disabled = selectedSeats.length === 0;
     }
 
-    // Add animation when hovering over seats
-    document.querySelectorAll('.seat-label:not(.booked)').forEach(label => {
-        label.addEventListener('mouseenter', function() {
-            if (!this.previousElementSibling.checked) {
-                this.style.transform = 'scale(1.1)';
-                this.style.boxShadow = '0 1px 4px rgba(0, 0, 0, 0.15)';
-            }
-        });
-
-        label.addEventListener('mouseleave', function() {
-            if (!this.previousElementSibling.checked) {
-                this.style.transform = '';
-                this.style.boxShadow = '';
-            }
-        });
+    // Form submission handler
+    document.getElementById('booking-form').addEventListener('submit', function(e) {
+        if (selectedSeats.length === 0) {
+            e.preventDefault();
+            alert('Please select at least one seat');
+        }
     });
+
+    // Initialize the booking summary
+    updateBookingSummary();
 });
 </script>
 {% endblock %}

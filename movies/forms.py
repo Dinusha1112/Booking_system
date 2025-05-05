@@ -10,10 +10,8 @@ class BookingForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         showtime = kwargs.pop('showtime', None)
         super().__init__(*args, **kwargs)
-        if showtime:
+        if showtime and showtime.theater.screen_set.exists():
             screen = showtime.theater.screen_set.first()
-            if screen:
-                # Show ALL seats for this screen
-                self.fields['seats'].queryset = Seat.objects.filter(
-                    screen=screen
-                ).order_by('row', 'seat_number')
+            self.fields['seats'].queryset = Seat.objects.filter(
+                screen=screen
+            ).order_by('row', 'seat_number')

@@ -12,6 +12,39 @@ class UserRegisterForm(UserCreationForm):
         model = User
         fields = ['username', 'email', 'phone_number', 'password1', 'password2']
 
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("This email is already in use.")
+        return email
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError("This username is already taken.")
+        return username
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        if commit:
+            user.save()
+            # Get or create the user profile and save the phone number
+            profile = UserProfile.objects.get(user=user)
+            profile.phone_number = self.cleaned_data['phone_number']
+            profile.save()
+        return user
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        if commit:
+            user.save()
+            # Get or create the user profile and save the phone number
+            profile = UserProfile.objects.get(user=user)
+            profile.phone_number = self.cleaned_data['phone_number']
+            profile.save()
+        return user
 
 class ContactForm(forms.Form):
     name = forms.CharField(max_length=100)
